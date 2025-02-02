@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './pages/login/login';
+import Home from './pages/home/home';
 import './App.css'
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/home" element={<Home />} />
         <Route path="*" element={<ErrorBoundary />} />
       </Routes>
     </Router>
