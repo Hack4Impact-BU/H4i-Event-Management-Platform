@@ -1,0 +1,62 @@
+.login_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    position: relative;
+}
+
+.login_terrier {
+    width: 180px;
+    height: 180px;
+    margin: 0;
+    transform: rotate(-42deg);
+    position: absolute;
+    top: 75px;
+    z-index: 2;
+}
+
+.login_box {
+    width: 400px;
+    height: 450px;
+    border: 1px solid #a49ca0;
+    border-radius: 3%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.login_h4iLogo {
+    width: 150px;
+    height: 150px;
+    margin: 50px;
+}
+
+.login_googleLogo {
+    width: 50px;
+
+}
+
+.login_button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 250px;
+    height: 60px;
+    border: none;
+    border-radius: 10px;
+    background-color: #0c0d0d;
+    color: #e8edee;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 20px;
+}
+
+.login_button:hover {
+    background-color: #656f7b;
+}
