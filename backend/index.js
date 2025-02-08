@@ -1,6 +1,7 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 
-const MONGO_URI = 'mongodb+srv://dwijya:LDwioICbJrkWsO2F@h4i-event-management.vv9i0.mongodb.net/event-management?retryWrites=true&w=majority&appName=h4i-event-management';
+const MONGO_URI = process.env.MONGO_URI;
 
 mongoose.connect(MONGO_URI)
 .then(() => {
