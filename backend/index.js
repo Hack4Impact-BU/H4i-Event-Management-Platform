@@ -14,10 +14,14 @@ mongoose.connect(MONGO_URI)
 const express = require('express');
 const Event = require('./models/event');
 
+const cors = require('cors');
+
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.post('/createEvent', async (req, res) => {
+  console.log(req.body);
   try {
     const event = new Event(req.body);
     await event.save();
