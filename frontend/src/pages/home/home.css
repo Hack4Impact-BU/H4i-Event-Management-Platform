@@ -1,0 +1,7 @@
+.home_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    gap: 3rem;
+}

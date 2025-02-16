@@ -1,5 +1,6 @@
 import React from 'react';
 import './home.css';
+import EventCard from '../../components/eventCard/EventCard';
 
 const Home = () => {
 
@@ -28,22 +29,22 @@ const Home = () => {
             }
 
             console.log("uploaded to database");
-            
+
             title.value = "";
             description.value = "";
             date.value = "";
             time.value = "";
             location.value = "";
-            
+
         } catch (err) {
             console.error(err);
         }
-        
+
     }
 
     return (
-        <div>
-            <form onSubmit={(e) => e.preventDefault()}>
+        <div className='home_container'>
+            {/* <form onSubmit={(e) => e.preventDefault()}>
                 <label htmlFor='title'>Title: </label>
                 <input type='text' 
                 id='title'/>
@@ -65,7 +66,8 @@ const Home = () => {
                 id='location'/>
                 <br/>
                 <button type='submit' onClick={submit}>Submit</button>
-            </form>
+            </form> */}
+            <EventCard />
         </div>
     );
 };
