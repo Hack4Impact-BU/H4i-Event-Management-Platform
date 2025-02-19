@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './home.css';
 import EventCard from '../../components/eventCard/EventCard';
 import NavBar from '../../components/navbar/navbar';
@@ -30,23 +30,46 @@ const Home = () => {
             }
 
             console.log("uploaded to database");
-            
+
             title.value = "";
             description.value = "";
             date.value = "";
             time.value = "";
             location.value = "";
-            
+
         } catch (err) {
             console.error(err);
         }
-        
+
     }
+
+    const [events, setEvents] = useState([]);
+
+    const fetchEvents = async () => {
+        try {
+            const response = await fetch('http://localhost:3000/events');
+            if (!response.ok) {
+                throw new Error('Failed to fetch events');
+            }
+            const data = await response.json();
+            setEvents(data);
+        } catch (error) {
+            console.error('Error fetching events:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchEvents();
+    }, []);
 
     return (
         <>
             <NavBar />
-            {/* <EventCard /> */}
+            <div className="home_container">
+                {events.map((event) => (
+                    <EventCard key={event._id} event={event} />
+                ))}
+            </div>
         </>
     );
 };

@@ -13,6 +13,7 @@
     justify-content: space-evenly;
     background-color: #B6D4F0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
 }
 
 .pages {
@@ -24,7 +25,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-evenly;
-    
+
 }
 
 #h4i_logo {
@@ -34,23 +35,23 @@
 
 #event_icon {
     margin: 10px;
-    font-size: 35px;
+    font-size: 2rem;
     color: #231F20;
 }
 
 #finance_icon {
-    font-size: 35px;
+    font-size: 2rem;
     color: #000;
 }
 
 #budget_icon {
     margin: 10px;
-    font-size: 35px;
+    font-size: 2rem;
     color: #000;
 }
 
 #setting_button {
-    font-size: 35px;
+    font-size: 2rem;
     color: #000;
 }
 
