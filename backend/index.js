@@ -4,12 +4,12 @@ const mongoose = require('mongoose');
 const MONGO_URI = process.env.MONGO_URI;
 
 mongoose.connect(MONGO_URI)
-.then(() => {
-  console.log('MongoDB connected successfully');
-})
-.catch((err) => {
-  console.error('MongoDB connection error:', err);
-});
+  .then(() => {
+    console.log('MongoDB connected successfully');
+  })
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+  });
 
 const express = require('express');
 const Event = require('./models/event');
@@ -28,6 +28,16 @@ app.post('/createEvent', async (req, res) => {
     res.status(201).send(event);
   } catch (error) {
     res.status(400).send(error);
+  }
+});
+
+app.get('/events', async (req, res) => {
+  try {
+    const events = await Event.find();
+    res.status(200).json(events);
+    console.log(events);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
