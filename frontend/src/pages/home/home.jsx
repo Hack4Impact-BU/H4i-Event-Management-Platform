@@ -1,6 +1,7 @@
 import React from 'react';
 import './home.css';
 import EventCard from '../../components/eventCard/EventCard';
+import NavBar from '../../components/navbar/navbar';
 
 const Home = () => {
 
@@ -43,31 +44,10 @@ const Home = () => {
     }
 
     return (
-        <div>
-            <form onSubmit={(e) => e.preventDefault()}>
-                <label htmlFor='title'>Title: </label>
-                <input type='text' 
-                id='title'/>
-                <br/>
-                <label htmlFor='description'>Description: </label>
-                <input type='text' 
-                id='description'/>
-                <br/>
-                <label htmlFor='date'>Date: </label>
-                <input type='text' 
-                id='date'/>
-                <br/>
-                <label htmlFor='time'>Time: </label>
-                <input type='text' 
-                id='time'/>
-                <br/>
-                <label htmlFor='location'>Location: </label>
-                <input type='text' 
-                id='location'/>
-                <br/>
-                <button type='submit' onClick={submit}>Submit</button>
-            </form>
-        </div>
+        <>
+            <NavBar />
+            {/* <EventCard /> */}
+        </>
     );
 };
 
