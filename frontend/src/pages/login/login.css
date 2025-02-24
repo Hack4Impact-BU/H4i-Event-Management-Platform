@@ -12,8 +12,8 @@
     height: 180px;
     margin: 0;
     transform: rotate(-42deg);
-    position: absolute;
-    top: 75px;
+    position: relative;
+    top: 65px;
     z-index: 2;
 }
 
