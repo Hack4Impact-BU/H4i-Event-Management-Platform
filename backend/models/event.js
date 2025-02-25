@@ -14,30 +14,32 @@ const EventSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  startTime: {
-    type: String,
-    required: true
-  },
-  endTime: {
-    type: String,
-    required: true
+  time: {
+    start: {
+      type: String,
+      default: ""
+    },
+    end: {
+      type: String,
+      default: ""
+    }
   },
   location: {
     type: String,
     required: true
   },
-  tags: {
+  tag: {
+    type: String,
+    default: "general"
+  },
+  tasks: {
     type: [String],
     default: []
   },
-  tasks: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Task'
-  }],
-  links: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Link'
-  }],
+  links: {
+    type: [String],
+    default: []
+  },
   budget: {
     predicted: {
       type: Number,
@@ -48,22 +50,10 @@ const EventSchema = new mongoose.Schema({
       default: 0.00
     }
   },
-  headCount: {
+  attendance: {
     type: Number,
     default: 0
   },
-  createdBy: {
-    type: String,
-    default: ''
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
 });
 
 const Event = mongoose.model('Event', EventSchema);

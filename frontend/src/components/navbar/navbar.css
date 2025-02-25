@@ -5,14 +5,14 @@
     height: 100px;
     padding: 0;
     margin: 0;
-    position: fixed;
+    position: sticky;
     top: 0;
     left: 0;
     display: flex;
     align-items: center;
     justify-content: space-evenly;
     background-color: #B6D4F0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    border-bottom: #666666 3px solid;
     z-index: 1000;
 }
 
