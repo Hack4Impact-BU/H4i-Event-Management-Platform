@@ -35,11 +35,25 @@ app.get('/events', async (req, res) => {
   try {
     const events = await Event.find();
     res.status(200).json(events);
-    console.log(events);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
+
+app.post('/updateEvent', async (req, res) => {
+  console.log(req.body);
+  try {
+    const event = await Event.findById(req.body._id);
+    console.log(event);
+    event.budget.predicted = req.body.budget.predicted;
+    event.budget.actual = req.body.budget.actual;
+    event.attendance = req.body.attendance;
+    await event.save();
+    res.status(200).send(event);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+})
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

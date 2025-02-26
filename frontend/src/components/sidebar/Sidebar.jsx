@@ -18,6 +18,39 @@ const Sidebar = ({ selectedEvent, closeSidebar }) => {
     }
   }, [selectedEvent]);
 
+  // calls updateEvent when the predictedBudget, actualSpent, or attendance changes
+  useEffect(() => {
+    if(selectedEvent) {
+      updateEvent();
+    }
+  }, [predictedBudget, actualSpent, attendance]);
+
+  const updateEvent = async () => {
+    try { 
+      const response = await fetch("http://localhost:3000/updateEvent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          _id: selectedEvent._id,
+          budget: {
+            predicted: predictedBudget,
+            actual: actualSpent,
+          },
+          attendance: attendance,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update event");
+      }
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    }
+  }
+
   return (
     <div className={`home_sidebarContainer ${selectedEvent ? "open" : ""}`}>
       <IconButton id="iconButton" onClick={closeSidebar}>
