@@ -3,7 +3,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 import Terrier from '../../assets/terrier.png';
-import H4iLogo from '../../assets/hack4impact-logo.jpg';
+import H4iLogo from '../../assets/h4i_removed_bg.png';
 import GoogleLogo from '../../assets/google-logo.png';
 import "./login.css";
 
