@@ -10,6 +10,7 @@
     background-color: #E4E9EE;
     padding: 1.5rem;
     font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
 }
 
 .eventCard_header {

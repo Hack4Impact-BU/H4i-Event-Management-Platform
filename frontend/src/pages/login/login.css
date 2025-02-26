@@ -1,25 +1,29 @@
 .login_container {
     display: flex;
-    justify-content: center;
+    justify-content: bottom;
     align-items: center;
-    height: 100vh;
+    height: 95vh;
+    width: auto;
     flex-direction: column;
-    position: relative;
 }
 
 .login_terrier {
-    width: 180px;
-    height: 180px;
+    width: 20vw;
+    max-width: 180px;
+    height: 20vw;
+    max-height: 180px;
     margin: 0;
     transform: rotate(-42deg);
-    position: relative;
-    top: 65px;
+    position: absolute;
+    top: 7vh;
     z-index: 2;
 }
 
 .login_box {
-    width: 400px;
-    height: 450px;
+    width: 80vw;
+    max-width: 400px;
+    height: 90vw;
+    max-height: 450px;
     border: 1px solid #a49ca0;
     border-radius: 3%;
     display: flex;
@@ -27,6 +31,7 @@
     justify-content: center;
     align-items: center;
     position: relative;
+    top: 22vh;
     z-index: 1;
 }
 

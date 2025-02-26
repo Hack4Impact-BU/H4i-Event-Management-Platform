@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './home.css';
 import EventCard from '../../components/eventCard/EventCard';
-import NavBar from '../../components/navbar/navbar';
+import NavBar from '../../components/navbar/Navbar';
 import { IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -48,7 +48,8 @@ const Home = () => {
         
         <div className={`home_eventsContainer ${selectedEvent ? 'sidebar-open' : ''}`}>
           {events.map((event) => (
-            <div className='home_cardContainer' key={event._id} onClick={() => setSelectedEvent(event)}>
+            <div className='home_cardContainer' key={event._id} 
+            onClick={() => setSelectedEvent(event)}>
               <EventCard event={event} />
             </div>
           ))}
