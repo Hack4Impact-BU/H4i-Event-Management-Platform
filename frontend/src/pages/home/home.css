@@ -9,6 +9,7 @@ body {
     justify-content: center;
     padding-top: 4rem;
     transition: transform 0.3s ease;
+    margin-top: 5rem;
 }
 
 .home_container.sidebar-open {
@@ -16,14 +17,17 @@ body {
 }
 
 .home_eventsContainer {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(16rem, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    /* grid-template-columns: repeat(3, minmax(16rem, 1fr)); */
     gap: 3rem;
+    width: 63rem;
+    transition: width 0.3s ease;
 }
 
-/* .home_eventsContainer.sidebar-open {
-    grid-template-columns: repeat(3, minmax(16rem, 1fr));
-} */
+.home_eventsContainer.sidebar-open {
+    width: 41rem;
+}
 
 #filterButton {
     font-size: 2rem;
