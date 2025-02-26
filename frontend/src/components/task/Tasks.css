@@ -32,6 +32,21 @@
     cursor: pointer;
 }
 
+.dropdown_selected_value.not-started,
+.dropdown_option.not-started {
+    color: red;
+}
+
+.dropdown_selected_value.in-progress,
+.dropdown_option.in-progress {
+    color: blue;
+}
+
+.dropdown_selected_value.done,
+.dropdown_option.done {
+    color: green;
+}
+
 .dropdown_arrow {
     width: 0.625rem;
     height: 0.625rem;
