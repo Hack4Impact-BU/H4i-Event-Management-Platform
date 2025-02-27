@@ -9,7 +9,7 @@
     background-color: #E4E9EE;
     transition: transform 0.3s ease;
     padding: 1.5rem;
-    box-shadow: 0px 0 5px rgba(0, 0, 0, 0.5);
+    border-left: 2px solid #666666;
     overflow: auto;
 }
 
@@ -43,11 +43,11 @@
     margin-top: 2rem;
     padding-bottom: 2rem;
     border-bottom: 2px solid #a0a0a0;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .sidebar_links {
-    margin-bottom: 2rem;
+    margin-top: 2rem;
 }
 
 .sidebar_budget {
@@ -71,7 +71,6 @@
     background-color: white;
     font-size: 1rem;
     font-family: 'Jetbrains Mono', monospace;
-    ;
     padding: 0.5rem 0.75rem;
     margin: 0.5rem;
     border-radius: 0.625rem;
@@ -81,4 +80,8 @@
 .budget_item input:focus {
     outline: none;
     box-shadow: 0 0 0 2px #2684ff;
+}
+
+.budget_net {
+    margin-left: 1.25rem;
 }
