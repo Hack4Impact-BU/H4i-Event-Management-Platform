@@ -27,8 +27,8 @@ const Sidebar = ({ selectedEvent, closeSidebar }) => {
   }, [predictedBudget, actualSpent, attendance]);
 
   const updateEvent = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/updateEvent", {
+    try { 
+          const response = await fetch("http://localhost:3000/updateEvent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
