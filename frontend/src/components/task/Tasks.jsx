@@ -51,9 +51,8 @@ const CustomDropdown = ({ options, defaultValue, onChange }) => {
           {options.map((option) => (
             <div
               key={option}
-              className={`dropdown_option ${
-                selectedOption === option ? "selected" : ""
-              } ${getClassName(option)}`}
+              className={`dropdown_option ${selectedOption === option ? "selected" : ""
+                } ${getClassName(option)}`}
               onClick={() => handleOptionClick(option)}
             >
               {option}
@@ -65,11 +64,14 @@ const CustomDropdown = ({ options, defaultValue, onChange }) => {
   );
 };
 
-const Task = ({ task }) => {
+const Task = ({ task, onStatusChange }) => {
   const [status, setStatus] = useState(task.status || "Not Started");
 
   const handleStatusChange = (newStatus) => {
     setStatus(newStatus);
+    if (onStatusChange) {
+      onStatusChange(task._id, newStatus);
+    }
   };
 
   return (
@@ -83,5 +85,6 @@ const Task = ({ task }) => {
     </div>
   );
 };
+
 
 export default Task;

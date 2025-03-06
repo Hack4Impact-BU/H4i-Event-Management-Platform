@@ -11,7 +11,7 @@ import Sidebar from '../../components/sidebar/Sidebar';
 
 const Home = () => {
   const [events, setEvents] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null); 
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const fetchEvents = async () => {
     try {
@@ -35,7 +35,7 @@ const Home = () => {
   return (
     <>
       <NavBar />
-      
+
       <div className={`home_container ${selectedEvent ? 'sidebar-open' : ''}`}>
         <div className="home_buttonContainer">
           <IconButton>
@@ -45,18 +45,18 @@ const Home = () => {
             <AddIcon id="addButton" />
           </IconButton>
         </div>
-        
+
         <div className={`home_eventsContainer ${selectedEvent ? 'sidebar-open' : ''}`}>
           {events.map((event) => (
-            <div className='home_cardContainer' key={event._id} 
-            onClick={() => setSelectedEvent(event)}>
+            <div className='home_cardContainer' key={event._id}
+              onClick={() => setSelectedEvent(event)}>
               <EventCard event={event} />
             </div>
           ))}
         </div>
         <div className='home_emptyDiv'></div>
       </div>
-      
+
       <Sidebar selectedEvent={selectedEvent} closeSidebar={closeSidebar} />
     </>
   );
