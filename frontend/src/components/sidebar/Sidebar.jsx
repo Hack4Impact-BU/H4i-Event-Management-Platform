@@ -3,6 +3,7 @@ import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import "./Sidebar.css";
 import Tasks from "../task/Tasks";
+import TextareaAutosize from "react-textarea-autosize";
 
 const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   // Local copy of the event including tasks.
@@ -12,6 +13,12 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   const [actualSpent, setActualSpent] = useState("");
   const [attendance, setAttendance] = useState("");
   const [net, setNet] = useState(0);
+  const [title, setTitle] = useState("");
+  const [date, setDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [location, setLocation] = useState("");
+  const [description, setDescription] = useState("");
 
   // When selectedEvent changes, update local event data and logistics fields.
   useEffect(() => {
@@ -20,6 +27,12 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
       setPredictedBudget(selectedEvent.budget.predicted);
       setActualSpent(selectedEvent.budget.actual);
       setAttendance(selectedEvent.attendance);
+      setTitle(selectedEvent.title);
+      setDate(selectedEvent.date);
+      setStartTime(selectedEvent.time.start);
+      setEndTime(selectedEvent.time.end);
+      setLocation(selectedEvent.location);
+      setDescription(selectedEvent.description);
     }
   }, [selectedEvent]);
 
@@ -28,13 +41,26 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
     setNet(predictedBudget - actualSpent);
   }, [predictedBudget, actualSpent]);
 
-  // Update the event on logistics changes.
+  // Update the event on logistics, date/time, or text changes.
   useEffect(() => {
-    if (eventData) {
-      updateEvent();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [predictedBudget, actualSpent, attendance]);
+    const timer = setTimeout(() => {
+      if (eventData) {
+        updateEvent();
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+    // Include all fields that trigger an update.
+  }, [
+    predictedBudget,
+    actualSpent,
+    attendance,
+    date,
+    startTime,
+    endTime,
+    title,
+    location,
+    description,
+  ]);
 
   // Function to update the event on the backend.
   const updateEvent = async () => {
@@ -46,11 +72,19 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
         },
         body: JSON.stringify({
           _id: eventData._id,
+          title: title,
+          location: location,
+          description: description,
           budget: {
             predicted: predictedBudget,
             actual: actualSpent,
           },
           attendance: attendance,
+          date: date,
+          time: {
+            start: startTime,
+            end: endTime,
+          },
         }),
       });
       if (!response.ok) {
@@ -74,7 +108,6 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
     );
     const updatedEventData = { ...eventData, tasks: updatedTasks };
     setEventData(updatedEventData);
-    // Inform the parent (Home) about the change so that EventCard re-renders.
     if (onUpdateEvent) {
       onUpdateEvent(updatedEventData);
     }
@@ -87,12 +120,47 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
       </IconButton>
       {eventData && (
         <div className="sidebar_content">
-          <h1 className="sidebar_title">{eventData.title}</h1>
-          <h2 className="sidebar_subtitle">
-            {eventData.date} {eventData.time.start}-{eventData.time.end}
-          </h2>
-          <h2 className="sidebar_subtitle">{eventData.location}</h2>
-          <p>{eventData.description}</p>
+          <TextareaAutosize
+            className="sidebar_title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter title"
+          />
+          {/* Date Input */}
+          <input
+            className="sidebar_date"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+          {/* Time Inputs */}
+          <div className="sidebar_timeContainer">
+            <input
+              className="sidebar_time"
+              type="time"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+            />
+            <p> - </p>
+            <input
+              className="sidebar_time"
+              type="time"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+            />
+          </div>
+          <TextareaAutosize
+            className="sidebar_location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="Enter location"
+          />
+          <TextareaAutosize
+            className="sidebar_description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Enter description"
+          />
           <div className="sidebar_tasks">
             {eventData.tasks.map((task) => (
               <Tasks
