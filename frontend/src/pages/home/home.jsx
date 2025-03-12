@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import './home.css';
+import './Home.css';
 import EventCard from '../../components/eventCard/EventCard';
 import NavBar from '../../components/navbar/Navbar';
 import { IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import CloseIcon from '@mui/icons-material/Close';
 import Sidebar from '../../components/sidebar/Sidebar';
-
 
 const Home = () => {
   const [events, setEvents] = useState([]);
@@ -32,6 +30,17 @@ const Home = () => {
 
   const closeSidebar = () => setSelectedEvent(null);
 
+  // Callback to update an event in the events array
+  const handleUpdateEvent = (updatedEvent) => {
+    setEvents(prevEvents =>
+      prevEvents.map(event => event._id === updatedEvent._id ? updatedEvent : event)
+    );
+    // Also update the selected event if it’s the one being updated.
+    if (selectedEvent && selectedEvent._id === updatedEvent._id) {
+      setSelectedEvent(updatedEvent);
+    }
+  };
+
   return (
     <>
       <NavBar />
@@ -48,8 +57,11 @@ const Home = () => {
 
         <div className={`home_eventsContainer ${selectedEvent ? 'sidebar-open' : ''}`}>
           {events.map((event) => (
-            <div className='home_cardContainer' key={event._id}
-              onClick={() => setSelectedEvent(event)}>
+            <div
+              className='home_cardContainer'
+              key={event._id}
+              onClick={() => setSelectedEvent(event)}
+            >
               <EventCard event={event} />
             </div>
           ))}
@@ -57,7 +69,11 @@ const Home = () => {
         <div className='home_emptyDiv'></div>
       </div>
 
-      <Sidebar selectedEvent={selectedEvent} closeSidebar={closeSidebar} />
+      <Sidebar
+        selectedEvent={selectedEvent}
+        closeSidebar={closeSidebar}
+        onUpdateEvent={handleUpdateEvent}
+      />
     </>
   );
 };

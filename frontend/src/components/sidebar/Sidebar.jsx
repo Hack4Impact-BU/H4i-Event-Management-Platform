@@ -4,7 +4,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import "./Sidebar.css";
 import Tasks from "../task/Tasks";
 
-const Sidebar = ({ selectedEvent, closeSidebar }) => {
+const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   // Local copy of the event including tasks.
   const [eventData, setEventData] = useState(selectedEvent);
   // State for logistics.
@@ -58,6 +58,10 @@ const Sidebar = ({ selectedEvent, closeSidebar }) => {
       }
       const data = await response.json();
       console.log(data);
+      setEventData(data);
+      if (onUpdateEvent) {
+        onUpdateEvent(data);
+      }
     } catch (error) {
       console.error("Error updating event:", error);
     }
@@ -68,7 +72,12 @@ const Sidebar = ({ selectedEvent, closeSidebar }) => {
     const updatedTasks = eventData.tasks.map((task) =>
       task._id === taskId ? { ...task, status: newStatus } : task
     );
-    setEventData({ ...eventData, tasks: updatedTasks });
+    const updatedEventData = { ...eventData, tasks: updatedTasks };
+    setEventData(updatedEventData);
+    // Inform the parent (Home) about the change so that EventCard re-renders.
+    if (onUpdateEvent) {
+      onUpdateEvent(updatedEventData);
+    }
   };
 
   return (

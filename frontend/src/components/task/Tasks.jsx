@@ -69,9 +69,21 @@ const Task = ({ task, onStatusChange }) => {
 
   const handleStatusChange = (newStatus) => {
     setStatus(newStatus);
+    // Optional: call any parent callback with the updated status
     if (onStatusChange) {
       onStatusChange(task._id, newStatus);
     }
+    // Make an API call to update the task status in the backend
+    fetch("http://localhost:3000/updateTaskStatus", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ taskId: task._id, newStatus }),
+    })
+      .then((response) => response.json())
+      .then((data) => console.log("Task updated:", data))
+      .catch((err) => console.error("Error updating task:", err));
   };
 
   return (
@@ -85,6 +97,7 @@ const Task = ({ task, onStatusChange }) => {
     </div>
   );
 };
+
 
 
 export default Task;
