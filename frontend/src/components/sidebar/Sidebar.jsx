@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import "./Sidebar.css";
 import Tasks from "../task/Tasks";
 import TextareaAutosize from "react-textarea-autosize";
+import AddIcon from "@mui/icons-material/Add";
 
 const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   // Local copy of the event including tasks.
@@ -19,6 +20,12 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   const [endTime, setEndTime] = useState("");
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
+  const [isAddingTask, setIsAddingTask] = useState(false);
+  const [newTaskName, setNewTaskName] = useState("");
+
+  // Ref to track if update is from user or server
+  const isUserAction = useRef(false);
+  const pendingUpdate = useRef(false);
 
   // When selectedEvent changes, update local event data and logistics fields.
   useEffect(() => {
@@ -43,13 +50,26 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
 
   // Update the event on logistics, date/time, or text changes.
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (eventData) {
-        updateEvent();
-      }
-    }, 1000);
-    return () => clearTimeout(timer);
-    // Include all fields that trigger an update.
+    // Skip initial render and only update if we have real data changes
+    if (!eventData || !selectedEvent) return;
+
+    // If this change was triggered by user action
+    if (isUserAction.current) {
+      pendingUpdate.current = true;
+      const timer = setTimeout(() => {
+        if (pendingUpdate.current) {
+          updateEvent();
+          pendingUpdate.current = false;
+        }
+      }, 1000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+
+    // Reset user action flag for future changes
+    isUserAction.current = true;
   }, [
     predictedBudget,
     actualSpent,
@@ -61,6 +81,12 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
     location,
     description,
   ]);
+
+  // Helper functions to mark inputs as user actions
+  const handleUserInput = (setter) => (e) => {
+    isUserAction.current = true;
+    setter(e.target.type === "number" ? Number(e.target.value) : e.target.value);
+  };
 
   // Function to update the event on the backend.
   const updateEvent = async () => {
@@ -75,6 +101,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
           title: title,
           location: location,
           description: description,
+          tasks: eventData.tasks,
           budget: {
             predicted: predictedBudget,
             actual: actualSpent,
@@ -91,7 +118,8 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
         throw new Error("Failed to update event");
       }
       const data = await response.json();
-      console.log(data);
+      // Temporarily disable user action flag to prevent loop
+      isUserAction.current = false;
       setEventData(data);
       if (onUpdateEvent) {
         onUpdateEvent(data);
@@ -103,19 +131,164 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
 
   // Callback to update the status of a specific task.
   const handleTaskStatusChange = (taskId, newStatus) => {
+    isUserAction.current = true;
     const updatedTasks = eventData.tasks.map((task) =>
       task._id === taskId ? { ...task, status: newStatus } : task
     );
     const updatedEventData = { ...eventData, tasks: updatedTasks };
     setEventData(updatedEventData);
-    if (onUpdateEvent) {
-      onUpdateEvent(updatedEventData);
+    updateEvent();
+  };
+
+  const handleAddTask = () => {
+    setIsAddingTask(true);
+  };
+
+  const addNewTask = async () => {
+    if (newTaskName.trim() === "") {
+      return;
+    }
+
+    // Clear input immediately for better UX
+    const taskName = newTaskName;
+    setNewTaskName("");
+    setIsAddingTask(false);
+
+    // Create the new task locally first
+    const newTask = {
+      name: taskName,
+      status: "Not Started",
+    };
+
+    // Add to local state
+    const updatedTasks = [...eventData.tasks, newTask];
+
+    // Directly send API request without triggering useEffect
+    try {
+      const response = await fetch("http://localhost:3000/updateEvent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          _id: eventData._id,
+          title: title,
+          location: location,
+          description: description,
+          tasks: updatedTasks,
+          budget: {
+            predicted: predictedBudget,
+            actual: actualSpent,
+          },
+          attendance: attendance,
+          date: date,
+          time: {
+            start: startTime,
+            end: endTime,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update event with new task");
+      }
+
+      // Get the updated event data (with proper IDs assigned by MongoDB)
+      const data = await response.json();
+
+      // Temporarily disable user action flag to prevent loop
+      isUserAction.current = false;
+      setEventData(data);
+
+      // Update the parent component through callback
+      if (onUpdateEvent) {
+        onUpdateEvent(data);
+      }
+    } catch (error) {
+      console.error("Error adding new task:", error);
+    }
+  };
+
+  const handleNewTaskKeyDown = (e) => {
+    if (e.key === "Enter") {
+      addNewTask();
+    }
+  };
+
+  const handleNewTaskBlur = () => {
+    if (newTaskName.trim() !== "") {
+      addNewTask();
+    } else {
+      setIsAddingTask(false);
+    }
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    isUserAction.current = true;
+
+    // Filter out the deleted task
+    const updatedTasks = eventData.tasks.filter(task => task._id !== taskId);
+    console.log("Tasks after deletion:", updatedTasks); // Add this log
+
+    const updatedEventData = { ...eventData, tasks: updatedTasks };
+
+    // Update local state
+    setEventData(updatedEventData);
+
+    // Create the request payload
+    const payload = {
+      _id: eventData._id,
+      title: title,
+      location: location,
+      description: description,
+      tasks: updatedTasks,
+      budget: {
+        predicted: predictedBudget,
+        actual: actualSpent,
+      },
+      attendance: attendance,
+      date: date,
+      time: {
+        start: startTime,
+        end: endTime,
+      },
+    };
+
+    console.log("Sending payload:", payload); // Add this log
+
+    // Send update to server
+    try {
+      const response = await fetch("http://localhost:3000/updateEvent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete task");
+      }
+
+      const data = await response.json();
+      console.log("Response from server:", data); // Add this log
+
+      // Temporarily disable user action flag to prevent loop
+      isUserAction.current = false;
+      setEventData(data);
+
+      // Update the parent component
+      if (onUpdateEvent) {
+        onUpdateEvent(data);
+      }
+    } catch (error) {
+      console.error("Error deleting task:", error);
     }
   };
 
   return (
     <div className={`home_sidebarContainer ${selectedEvent ? "open" : ""}`}>
-      <IconButton id="iconButton" onClick={closeSidebar}>
+      <IconButton id="closeIcon" onClick={closeSidebar}>
         <CloseIcon id="closeButton" />
       </IconButton>
       {eventData && (
@@ -123,7 +296,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
           <TextareaAutosize
             className="sidebar_title"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={handleUserInput(setTitle)}
             placeholder="Enter title"
           />
           {/* Date Input */}
@@ -131,7 +304,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
             className="sidebar_date"
             type="date"
             value={date}
-            onChange={(e) => setDate(e.target.value)}
+            onChange={handleUserInput(setDate)}
           />
           {/* Time Inputs */}
           <div className="sidebar_timeContainer">
@@ -139,36 +312,53 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
               className="sidebar_time"
               type="time"
               value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
+              onChange={handleUserInput(setStartTime)}
             />
             <p> - </p>
             <input
               className="sidebar_time"
               type="time"
               value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
+              onChange={handleUserInput(setEndTime)}
             />
           </div>
           <TextareaAutosize
             className="sidebar_location"
             value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            onChange={handleUserInput(setLocation)}
             placeholder="Enter location"
           />
           <TextareaAutosize
             className="sidebar_description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={handleUserInput(setDescription)}
             placeholder="Enter description"
           />
           <div className="sidebar_tasks">
-            {eventData.tasks.map((task) => (
+            {eventData.tasks && eventData.tasks.map((task) => (
               <Tasks
                 key={task._id}
                 task={task}
                 onStatusChange={handleTaskStatusChange}
+                onDelete={handleDeleteTask}
               />
             ))}
+            {isAddingTask ? (
+              <input
+                type="text"
+                value={newTaskName}
+                onChange={(e) => setNewTaskName(e.target.value)}
+                onKeyDown={handleNewTaskKeyDown}
+                onBlur={handleNewTaskBlur}
+                autoFocus
+                className="sidebar_taskInput"
+                placeholder="Enter task name"
+              />
+            ) : (
+              <IconButton onClick={handleAddTask} id="addButton">
+                <AddIcon id="addIcon" />
+              </IconButton>
+            )}
           </div>
           <div className="sidebar_budget">
             <h2 className="sidebar_subtitle">Logistics</h2>
@@ -178,9 +368,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
                 id="predictedBudget"
                 type="number"
                 value={predictedBudget}
-                onChange={(e) =>
-                  setPredictedBudget(Number(e.target.value))
-                }
+                onChange={handleUserInput(setPredictedBudget)}
               />
             </div>
             <div className="budget_item">
@@ -189,9 +377,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
                 id="actualSpent"
                 type="number"
                 value={actualSpent}
-                onChange={(e) =>
-                  setActualSpent(Number(e.target.value))
-                }
+                onChange={handleUserInput(setActualSpent)}
               />
             </div>
             <div className="budget_item">
@@ -206,15 +392,13 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
                 id="attendance"
                 type="number"
                 value={attendance}
-                onChange={(e) =>
-                  setAttendance(Number(e.target.value))
-                }
+                onChange={handleUserInput(setAttendance)}
               />
             </div>
           </div>
           <div className="sidebar_links">
             <h2 className="sidebar_subtitle">Files</h2>
-            {eventData.links.map((link, index) => (
+            {eventData.links && eventData.links.map((link, index) => (
               <a key={index} href={link} target="_blank" rel="noreferrer">
                 {link}
               </a>

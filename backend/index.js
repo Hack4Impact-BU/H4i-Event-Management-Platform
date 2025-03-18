@@ -44,35 +44,54 @@ app.post('/updateEvent', async (req, res) => {
   console.log(req.body);
   try {
     const event = await Event.findById(req.body._id);
-    console.log(event);
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
 
-    // Update title, location, and description.
+    // Update title, location, and description
     event.title = req.body.title;
     event.location = req.body.location;
     event.description = req.body.description;
 
-    // Update logistics fields.
+    // Update logistics fields
     event.budget.predicted = req.body.budget.predicted;
     event.budget.actual = req.body.budget.actual;
     event.attendance = req.body.attendance;
 
-    // Update date if provided (convert to Date if needed).
+    // Update date if provided
     if (req.body.date) {
       event.date = req.body.date;
     }
-    // Update time if provided.
+
+    // Update time if provided
     if (req.body.time) {
       event.time.start = req.body.time.start;
       event.time.end = req.body.time.end;
     }
 
+    // IMPORTANT: Replace entire tasks array with the one from the request
+    // This ensures deletions are properly handled
+    if (req.body.tasks) {
+      // Clear existing tasks
+      event.tasks = [];
+
+      // Add all tasks from the request
+      req.body.tasks.forEach(task => {
+        event.tasks.push({
+          _id: task._id, // Keep existing IDs for existing tasks
+          name: task.name,
+          status: task.status
+        });
+      });
+    }
+
     await event.save();
     res.status(200).send(event);
   } catch (error) {
+    console.error("Error updating event:", error);
     res.status(500).json({ message: error.message });
   }
 });
-
 
 app.post('/updateTaskStatus', async (req, res) => {
   const { taskId, newStatus } = req.body;

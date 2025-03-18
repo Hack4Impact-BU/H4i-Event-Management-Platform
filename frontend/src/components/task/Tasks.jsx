@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./Tasks.css";
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
 
 const CustomDropdown = ({ options, defaultValue, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -64,7 +66,7 @@ const CustomDropdown = ({ options, defaultValue, onChange }) => {
   );
 };
 
-const Task = ({ task, onStatusChange }) => {
+const Task = ({ task, onStatusChange, onDelete }) => {
   const [status, setStatus] = useState(task.status || "Not Started");
 
   const handleStatusChange = (newStatus) => {
@@ -86,18 +88,30 @@ const Task = ({ task, onStatusChange }) => {
       .catch((err) => console.error("Error updating task:", err));
   };
 
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete(task._id);
+    }
+  };
+
   return (
     <div className="task_container" key={task._id}>
       <p className="task_name">{task.name}</p>
-      <CustomDropdown
-        options={["Not Started", "In Progress", "Done"]}
-        defaultValue={status}
-        onChange={handleStatusChange}
-      />
+      <div className="task_controls">
+        <CustomDropdown
+          options={["Not Started", "In Progress", "Done"]}
+          defaultValue={status}
+          onChange={handleStatusChange}
+        />
+        <IconButton
+          onClick={handleDelete}
+          className="delete_button"
+        >
+          <DeleteIcon className="delete_icon" />
+        </IconButton>
+      </div>
     </div>
   );
 };
-
-
 
 export default Task;
