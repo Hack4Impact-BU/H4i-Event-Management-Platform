@@ -5,7 +5,7 @@ import { Box, Typography } from '@mui/material';
 import Terrier from '../../assets/terrier.png';
 import H4iLogo from '../../assets/h4i_removed_bg.png';
 import GoogleLogo from '../../assets/google-logo.png';
-import "./login.css";
+import "./Login.css";
 
 const Login = ({ setIsAuthenticated }) => {
     const navigate = useNavigate();
