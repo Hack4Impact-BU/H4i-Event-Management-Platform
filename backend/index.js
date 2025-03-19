@@ -186,7 +186,7 @@ app.post('/sendInvite', async (req, res) => {
   } catch (error) {
     console.error(error);
   }
-})
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
