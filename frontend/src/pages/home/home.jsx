@@ -57,7 +57,7 @@ const Home = () => {
         <div className='home_emptyDiv'></div>
       </div>
       
-      <Sidebar selectedEvent={selectedEvent} closeSidebar={closeSidebar} />
+      <Sidebar selectedEvent={selectedEvent} closeSidebar={closeSidebar}/>
     </>
   );
 };

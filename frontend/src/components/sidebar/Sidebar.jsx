@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import "./Sidebar.css";
+import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import Tasks from "../task/Tasks";
+import "./Sidebar.css";
 
 const Sidebar = ({ selectedEvent, closeSidebar }) => {
   const [predictedBudget, setPredictedBudget] = useState("");
@@ -13,9 +14,9 @@ const Sidebar = ({ selectedEvent, closeSidebar }) => {
   // When the selectedEvent changes, update the state values
   useEffect(() => {
     if (selectedEvent) {
-      setPredictedBudget(selectedEvent.budget.predicted);
-      setActualSpent(selectedEvent.budget.actual);
-      setAttendance(selectedEvent.attendance);
+      setPredictedBudget(selectedEvent.budget.predicted || "");
+      setActualSpent(selectedEvent.budget.actual || "");
+      setAttendance(selectedEvent.attendance || "");
     }
   }, [selectedEvent]);
 
@@ -27,8 +28,9 @@ const Sidebar = ({ selectedEvent, closeSidebar }) => {
   }, [predictedBudget, actualSpent, attendance]);
 
   const updateEvent = async () => {
+    console.log('updating event');
     try { 
-          const response = await fetch("http://localhost:3000/updateEvent", {
+      const response = await fetch("http://localhost:3000/updateEvent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -46,9 +48,39 @@ const Sidebar = ({ selectedEvent, closeSidebar }) => {
         throw new Error("Failed to update event");
       }
       const data = await response.json();
-      console.log(data);
     } catch (error) {
       console.error('Error fetching events:', error);
+    }
+  }
+
+  const sendInvite = async () => {
+    try {
+      console.log("sending invite");
+      const response = await fetch ("http://localhost:3000/sendInvite", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          'summary': selectedEvent.title,
+          'location': selectedEvent.location,
+          'description': selectedEvent.description,
+          'start': {
+            'dateTime': `${selectedEvent.date}T${selectedEvent.time.start}:00-05:00`,
+            'timeZone': 'America/New_York'
+          },
+          'end': {
+            'dateTime': `${selectedEvent.date}T${selectedEvent.time.end}:00-05:00`,
+            'timeZone': 'America/New_York'
+          },
+        })
+      });
+      if (!response.ok) {
+        throw new Error("Failed to send calendar invite");
+      }
+
+    } catch (error) {
+      console.log('Error sending invite:', error);
     }
   }
 
@@ -68,6 +100,9 @@ const Sidebar = ({ selectedEvent, closeSidebar }) => {
           <h1 className="sidebar_title">{selectedEvent.title}</h1>
           <h2 className="sidebar_subtitle">
             {selectedEvent.date} {selectedEvent.time.start}-{selectedEvent.time.end}
+            <IconButton id="iconButton" onClick={sendInvite}>
+              <EventOutlinedIcon id="calendarButton"/>
+            </IconButton>
           </h2>
           <h2 className="sidebar_subtitle">{selectedEvent.location}</h2>
           <p>{selectedEvent.description}</p>
@@ -108,7 +143,7 @@ const Sidebar = ({ selectedEvent, closeSidebar }) => {
               <input
                 id="attendance"
                 type="number"
-                value={attendance}
+                value={selectedEvent.attendance}
                 onChange={(e) => setAttendance(e.target.value)}
               />
             </div>
