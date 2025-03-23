@@ -132,7 +132,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
 
   const sendInvite = async () => {
     try {
-      alert("invite sent!");
+      alert("Invite Sent!");
       console.log("sending invite");
       const response = await fetch ("http://localhost:3000/sendInvite", {
         method: "POST",
