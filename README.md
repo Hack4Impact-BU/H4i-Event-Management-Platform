@@ -19,7 +19,13 @@ An all in one platform to help the E-Board organize events and capture data to a
    ```sh
    MONGO_URI=
    ```
-4. Start the backend server:
+4. Create a `credentials` directory in the backend directory:
+   ```
+   mkdir credentials
+   ```
+5. Add the `credentials.json` file in the credentials directory
+
+6. Start the backend server:
    ```sh
    node index.js
    ```
