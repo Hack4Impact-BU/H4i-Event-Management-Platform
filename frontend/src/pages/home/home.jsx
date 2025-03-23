@@ -47,11 +47,11 @@ const Home = () => {
 
       <div className={`home_container ${selectedEvent ? 'sidebar-open' : ''}`}>
         <div className="home_buttonContainer">
-          <IconButton>
-            <FilterAltIcon id="filterButton" />
+          <IconButton id="filterButton">
+            <FilterAltIcon id="filterIcon" />
           </IconButton>
-          <IconButton>
-            <AddIcon id="addButton" />
+          <IconButton id="addButton">
+            <AddIcon id="addIcon"/>
           </IconButton>
         </div>
 

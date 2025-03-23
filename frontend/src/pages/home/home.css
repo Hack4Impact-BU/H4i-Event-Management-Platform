@@ -29,14 +29,17 @@ body {
     width: 41rem;
 }
 
-#filterButton {
-    font-size: 2rem;
+#filterButton,
+#addButton {
+    width: 3rem;
+    height: 3rem;
     color: #000;
 }
 
-#addButton {
-    font-size: 2rem;
-    color: #000;
+#filterIcon,
+#addIcon {
+    width: 100%;
+    height: 100%;
 }
 
 .home_buttonContainer {

@@ -25,14 +25,7 @@
 
 .sidebar_header {
     display: flex;
-    
-}
-
-#closeButton,
-#calendarButton {
-    width: 3rem;
-    justify-self: flex-end;
-    align-self: flex-end;
+    justify-content: space-between;
 }
 
 #addButton {
