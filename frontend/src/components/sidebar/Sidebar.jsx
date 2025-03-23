@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import "./Sidebar.css";
 import Tasks from "../task/Tasks";
+import "./Sidebar.css";
 import TextareaAutosize from "react-textarea-autosize";
 import AddIcon from "@mui/icons-material/Add";
 
@@ -127,7 +129,43 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
     } catch (error) {
       console.error("Error updating event:", error);
     }
-  };
+  }
+
+  const sendInvite = async () => {
+    try {
+      console.log("sending invite");
+      const response = await fetch ("http://localhost:3000/sendInvite", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          'summary': selectedEvent.title,
+          'location': selectedEvent.location,
+          'description': selectedEvent.description,
+          'start': {
+            'dateTime': `${selectedEvent.date}T${selectedEvent.time.start}:00-05:00`,
+            'timeZone': 'America/New_York'
+          },
+          'end': {
+            'dateTime': `${selectedEvent.date}T${selectedEvent.time.end}:00-05:00`,
+            'timeZone': 'America/New_York'
+          },
+        })
+      });
+      if (!response.ok) {
+        throw new Error("Failed to send calendar invite");
+      }
+
+    } catch (error) {
+      console.log('Error sending invite:', error);
+    }
+  }
+
+  useEffect(() => {
+    setNet(predictedBudget - actualSpent);
+  }, [predictedBudget, actualSpent]);
+
 
   // Callback to update the status of a specific task.
   const handleTaskStatusChange = (taskId, newStatus) => {
@@ -291,8 +329,17 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
       <IconButton id="closeIcon" onClick={closeSidebar}>
         <CloseIcon id="closeButton" />
       </IconButton>
+      <IconButton id="iconButton" onClick={sendInvite}>
+        <EventOutlinedIcon id="calendarButton"/>
+      </IconButton>
       {eventData && (
         <div className="sidebar_content">
+          <h1 className="sidebar_title">{eventData.title}</h1>
+          <h2 className="sidebar_subtitle">
+            {eventData.date} {eventData.time.start}-{eventData.time.end}
+          </h2>
+          <h2 className="sidebar_subtitle">{eventData.location}</h2>
+          <p>{eventData.description}</p>
           <TextareaAutosize
             className="sidebar_title"
             value={title}
