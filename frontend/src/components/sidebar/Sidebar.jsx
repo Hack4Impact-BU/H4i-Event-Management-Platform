@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IconButton, SvgIcon } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import AddIcon from "@mui/icons-material/Add";
 import TextareaAutosize from "react-textarea-autosize";
 import Tasks from "../task/Tasks";
@@ -133,6 +132,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
 
   const sendInvite = async () => {
     try {
+      alert("invite sent!");
       console.log("sending invite");
       const response = await fetch ("http://localhost:3000/sendInvite", {
         method: "POST",
