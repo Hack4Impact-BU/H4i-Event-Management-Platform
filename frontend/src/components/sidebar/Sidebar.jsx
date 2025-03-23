@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { IconButton } from "@mui/material";
+import { IconButton, SvgIcon } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
-import "./Sidebar.css";
-import Tasks from "../task/Tasks";
-import "./Sidebar.css";
-import TextareaAutosize from "react-textarea-autosize";
 import AddIcon from "@mui/icons-material/Add";
+import TextareaAutosize from "react-textarea-autosize";
+import Tasks from "../task/Tasks";
+import GoogleCalIcon from "../../assets/google_calendar_icon.svg";
+import "./Sidebar.css";
 
 const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   // Local copy of the event including tasks.
@@ -326,12 +326,14 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
 
   return (
     <div className={`home_sidebarContainer ${selectedEvent ? "open" : ""}`}>
-      <IconButton id="closeIcon" onClick={closeSidebar}>
-        <CloseIcon id="closeButton" />
-      </IconButton>
-      <IconButton id="iconButton" onClick={sendInvite}>
-        <EventOutlinedIcon id="calendarButton"/>
-      </IconButton>
+      <div className="sidebar_header">
+        <IconButton id="closeIcon" onClick={closeSidebar}>
+          <CloseIcon id="closeButton" />
+        </IconButton>
+        <IconButton id="calendarIcon" onClick={sendInvite}>
+          <img src={GoogleCalIcon} />
+        </IconButton>
+      </div>
       {eventData && (
         <div className="sidebar_content">
           <h1 className="sidebar_title">{eventData.title}</h1>
