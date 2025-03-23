@@ -32,12 +32,10 @@
     width: 3rem;
 }
 
-#closeIcon,
-#calendarIcon {
-    width: 10%;
-
+#closeButton,
+#calendarButton {
+    width: 3rem;
 }
-
 
 #addIcon {
     font-size: 2rem;

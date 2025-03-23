@@ -327,21 +327,15 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   return (
     <div className={`home_sidebarContainer ${selectedEvent ? "open" : ""}`}>
       <div className="sidebar_header">
-        <IconButton id="closeIcon" onClick={closeSidebar}>
-          <CloseIcon id="closeButton" />
+        <IconButton id="closeButton" onClick={closeSidebar}>
+          <CloseIcon id="closeIcon" />
         </IconButton>
-        <IconButton id="calendarIcon" onClick={sendInvite}>
-          <img src={GoogleCalIcon} />
+        <IconButton id="calendarButton" onClick={sendInvite}>
+          <img src={GoogleCalIcon} id="calendarIcon"/>
         </IconButton>
       </div>
       {eventData && (
         <div className="sidebar_content">
-          <h1 className="sidebar_title">{eventData.title}</h1>
-          <h2 className="sidebar_subtitle">
-            {eventData.date} {eventData.time.start}-{eventData.time.end}
-          </h2>
-          <h2 className="sidebar_subtitle">{eventData.location}</h2>
-          <p>{eventData.description}</p>
           <TextareaAutosize
             className="sidebar_title"
             value={title}
