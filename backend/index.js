@@ -52,13 +52,13 @@ app.post('/updateEvent', async (req, res) => {
 
     // Update title, location, and description
     event.title = req.body.title;
-    event.location = req.body.location;
-    event.description = req.body.description;
+    event.location = req.body.location || "";
+    event.description = req.body.description || "";
 
     // Update logistics fields
-    event.budget.predicted = req.body.budget.predicted;
-    event.budget.actual = req.body.budget.actual;
-    event.attendance = req.body.attendance;
+    event.budget.predicted = req.body.budget.predicted || 0;
+    event.budget.actual = req.body.budget.actual || 0;
+    event.attendance = req.body.attendance || 0;
 
     // Update date if provided
     if (req.body.date) {
@@ -94,9 +94,6 @@ app.post('/updateEvent', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
-// TODO: send user email confirmation before adding to calendar
-// TODO: display text telling user that event was added to calendar
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 const TOKEN_PATH = path.join(process.cwd(), 'credentials/token.json');
