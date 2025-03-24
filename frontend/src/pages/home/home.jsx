@@ -19,6 +19,7 @@ const Home = () => {
       }
       const data = await response.json();
       setEvents(data);
+      return data;
     } catch (error) {
       console.error('Error fetching events:', error);
     }
@@ -41,6 +42,60 @@ const Home = () => {
     }
   };
 
+  const addEvent = async () => {
+    try {
+      const today = new Date().toISOString();
+      const date = today.substring(0,10);
+      const event = {
+        title: "New Event",
+        location: "",
+        description: "",
+        tasks: [
+          {
+            name: "Room Confirmation",
+            status: "Not Started"
+          },
+          {
+            name: "Finance Confirmation",
+            status: "Not Started"
+          },
+          {
+            name: "Finance Confirmation",
+            status: "Not Started"
+          }
+        ],
+        budget: {
+          predicted: 0,
+          actual: 0,
+        },
+        attendance: 0,
+        date: date,
+        time: {
+          start: "09:00",
+          end: "10:00"
+        }
+      };
+      const response = await fetch("http://localhost:3000/createEvent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(event),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to add event");
+      }
+      await response.json();
+      fetchEvents().then(events => {
+        setSelectedEvent(events[events.length - 1]);
+      });
+    } catch (error) {
+      console.error("Error adding event", error);
+    }
+  }
+
+
+
   return (
     <>
       <NavBar />
@@ -50,7 +105,7 @@ const Home = () => {
           <IconButton id="filterButton">
             <FilterAltIcon id="filterIcon" />
           </IconButton>
-          <IconButton id="addButton">
+          <IconButton id="addButton" onClick={addEvent}>
             <AddIcon id="addIcon"/>
           </IconButton>
         </div>
