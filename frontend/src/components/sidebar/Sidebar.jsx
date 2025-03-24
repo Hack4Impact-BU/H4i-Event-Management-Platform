@@ -91,13 +91,14 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
 
   // Function to update the event on the backend.
   const updateEvent = async () => {
-    try { 
-          const response = await fetch("http://localhost:3000/updateEvent", {
+    try {
+      const response = await fetch("http://localhost:3000/updateEvent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          _id: eventData._id,
           title: title,
           location: location,
           description: description,
