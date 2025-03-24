@@ -32,6 +32,10 @@ const EventSchema = new mongoose.Schema({
     type: String,
     default: "general",
   },
+  tagColor: {
+    type: String,
+    default: "",
+  },
   tasks: {
     type: [
       {
