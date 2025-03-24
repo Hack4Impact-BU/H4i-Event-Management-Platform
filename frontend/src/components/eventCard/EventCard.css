@@ -11,6 +11,12 @@
     padding: 1.5rem;
     font-family: 'JetBrains Mono', monospace;
     cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.eventCard_container:hover {
+    transform: translateY(-0.5rem);
+    box-shadow: 0 15px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
 .eventCard_header {

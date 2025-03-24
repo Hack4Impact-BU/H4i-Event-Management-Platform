@@ -95,28 +95,31 @@ app.post('/updateEvent', async (req, res) => {
 
 app.post('/updateTaskStatus', async (req, res) => {
   const { taskId, newStatus } = req.body;
+  console.log("Updating task status:", taskId, newStatus); // Add debugging
+
   try {
-    // Find the event document that has the task with the given taskId
-    const event = await Event.findOne({ "tasks._id": taskId });
-    if (!event) {
-      return res.status(404).json({ message: "Event not found" });
-    }
-    // Get the task subdocument by its id
-    const task = event.tasks.id(taskId);
-    if (!task) {
+    // Use the more reliable findOneAndUpdate with $ operators
+    const result = await Event.findOneAndUpdate(
+      { "tasks._id": taskId },
+      { $set: { "tasks.$.status": newStatus } },
+      { new: true } // Return updated document
+    );
+
+    if (!result) {
+      console.log("Task not found for ID:", taskId);
       return res.status(404).json({ message: "Task not found" });
     }
-    // Update the task's status
-    task.status = newStatus;
-    await event.save();
-    res.status(200).json(task);
+
+    // Find the updated task to return
+    const updatedTask = result.tasks.find(task => task._id.toString() === taskId);
+    console.log("Updated task:", updatedTask);
+
+    res.status(200).json(updatedTask);
   } catch (error) {
+    console.error("Error updating task status:", error);
     res.status(500).json({ message: error.message });
   }
 });
-
-
-
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

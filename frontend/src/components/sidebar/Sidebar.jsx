@@ -90,8 +90,8 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
 
   // Function to update the event on the backend.
   const updateEvent = async () => {
-    try { 
-          const response = await fetch("http://localhost:3000/updateEvent", {
+    try {
+      const response = await fetch("http://localhost:3000/updateEvent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -130,14 +130,38 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   };
 
   // Callback to update the status of a specific task.
-  const handleTaskStatusChange = (taskId, newStatus) => {
+  const handleTaskStatusChange = async (taskId, newStatus) => {
     isUserAction.current = true;
+
+    // Update local state first
     const updatedTasks = eventData.tasks.map((task) =>
       task._id === taskId ? { ...task, status: newStatus } : task
     );
     const updatedEventData = { ...eventData, tasks: updatedTasks };
     setEventData(updatedEventData);
-    updateEvent();
+
+    // Make direct API call to update task status
+    try {
+      const response = await fetch("http://localhost:3000/updateTaskStatus", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ taskId, newStatus }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to update task status");
+        throw new Error("Failed to update task status");
+      }
+
+      // Also notify parent component
+      if (onUpdateEvent) {
+        onUpdateEvent(updatedEventData);
+      }
+    } catch (error) {
+      console.error("Error updating task status:", error);
+    }
   };
 
   const handleAddTask = () => {

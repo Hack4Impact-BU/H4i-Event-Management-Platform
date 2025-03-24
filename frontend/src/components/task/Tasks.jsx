@@ -69,23 +69,21 @@ const CustomDropdown = ({ options, defaultValue, onChange }) => {
 const Task = ({ task, onStatusChange, onDelete }) => {
   const [status, setStatus] = useState(task.status || "Not Started");
 
+  // Update local status when task prop changes
+  useEffect(() => {
+    setStatus(task.status || "Not Started");
+  }, [task.status]);
+
   const handleStatusChange = (newStatus) => {
+    // Update local state immediately for responsive UI
     setStatus(newStatus);
-    // Optional: call any parent callback with the updated status
+
+    // Call the parent callback to handle the API update
     if (onStatusChange) {
       onStatusChange(task._id, newStatus);
     }
-    // Make an API call to update the task status in the backend
-    fetch("http://localhost:3000/updateTaskStatus", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ taskId: task._id, newStatus }),
-    })
-      .then((response) => response.json())
-      .then((data) => console.log("Task updated:", data))
-      .catch((err) => console.error("Error updating task:", err));
+
+    // Remove the direct API call from here since it's handled by the parent
   };
 
   const handleDelete = () => {
