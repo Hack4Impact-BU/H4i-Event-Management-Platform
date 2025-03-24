@@ -98,7 +98,6 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          _id: eventData._id,
           title: title,
           location: location,
           description: description,
