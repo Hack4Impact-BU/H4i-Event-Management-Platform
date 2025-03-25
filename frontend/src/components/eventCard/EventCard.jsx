@@ -9,7 +9,7 @@ export default function EventCard({ event }) {
     if (task.status === "In Progress") return acc + 1;
     return acc;
   }, 0);
-  const progressPercent = (earnedPoints / totalPoints) * 100;
+  const progressPercent = totalPoints > 0 ? (earnedPoints / totalPoints) * 100 : 0;
 
   // Utility to get acronym from title.
   const getAcronym = (title) => {
@@ -26,7 +26,9 @@ export default function EventCard({ event }) {
   return (
     <div className="eventCard_container">
       <div className="eventCard_header">
-        <p>{event.tags && event.tags.length ? event.tags.join(', ') : "general"}</p>
+        <p style={{ backgroundColor: event.tagColor || "#C2E2C7" }}>
+          {event.tag || "general"}
+        </p>
         <h1>{getAcronym(event.title)}</h1>
       </div>
       <div className="eventCard_body">

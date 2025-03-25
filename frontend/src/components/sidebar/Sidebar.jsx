@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IconButton, SvgIcon } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import "./Sidebar.css";
+import Tasks from "../task/Tasks";
+import Dropdown from "../dropdown/Dropdown";
+import TextareaAutosize from "react-textarea-autosize";
 import AddIcon from "@mui/icons-material/Add";
 import TextareaAutosize from "react-textarea-autosize";
 import Tasks from "../task/Tasks";
@@ -23,6 +27,11 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   const [description, setDescription] = useState("");
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
+  const [tag, setTag] = useState("");
+  const [isAddingTag, setIsAddingTag] = useState(false);
+  const [newTagName, setNewTagName] = useState("");
+  const [availableTags, setAvailableTags] = useState(["general", "speaker event", "social", "workshop"]);
+  const [tagColors, setTagColors] = useState({ general: "#C2E2C7" });
 
   // Ref to track if update is from user or server
   const isUserAction = useRef(false);
@@ -41,6 +50,8 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
       setEndTime(selectedEvent.time.end);
       setLocation(selectedEvent.location);
       setDescription(selectedEvent.description);
+      // Make sure we set the tag from the selected event, with a default fallback
+      setTag(selectedEvent.tag || "general");
     }
   }, [selectedEvent]);
 
@@ -81,6 +92,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
     title,
     location,
     description,
+    tag, // Add tag to the dependency array
   ]);
 
   // Helper functions to mark inputs as user actions
@@ -103,6 +115,8 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
           location: location,
           description: description,
           tasks: eventData.tasks,
+          tag: tag,
+          tagColor: tagColors[tag] || "#C2E2C7", // Include the tag color
           budget: {
             predicted: predictedBudget,
             actual: actualSpent,
@@ -168,14 +182,38 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
 
 
   // Callback to update the status of a specific task.
-  const handleTaskStatusChange = (taskId, newStatus) => {
+  const handleTaskStatusChange = async (taskId, newStatus) => {
     isUserAction.current = true;
+
+    // Update local state first
     const updatedTasks = eventData.tasks.map((task) =>
       task._id === taskId ? { ...task, status: newStatus } : task
     );
     const updatedEventData = { ...eventData, tasks: updatedTasks };
     setEventData(updatedEventData);
-    updateEvent();
+
+    // Make direct API call to update task status
+    try {
+      const response = await fetch("http://localhost:3000/updateTaskStatus", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ taskId, newStatus }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to update task status");
+        throw new Error("Failed to update task status");
+      }
+
+      // Also notify parent component
+      if (onUpdateEvent) {
+        onUpdateEvent(updatedEventData);
+      }
+    } catch (error) {
+      console.error("Error updating task status:", error);
+    }
   };
 
   const handleAddTask = () => {
@@ -214,6 +252,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
           location: location,
           description: description,
           tasks: updatedTasks,
+          tag: tag, // Include tag in the payload
           budget: {
             predicted: predictedBudget,
             actual: actualSpent,
@@ -280,6 +319,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
       location: location,
       description: description,
       tasks: updatedTasks,
+      tag: tag, // Include tag in the payload
       budget: {
         predicted: predictedBudget,
         actual: actualSpent,
@@ -324,6 +364,95 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
     }
   };
 
+  // Handle tag change
+  const handleTagChange = (newTag) => {
+    if (newTag === "Add tag...") {
+      setIsAddingTag(true);
+    } else {
+      isUserAction.current = true;
+      setTag(newTag);
+    }
+  };
+
+  // Add a new tag
+  const handleAddNewTag = async () => {
+    if (newTagName.trim() === "") {
+      setIsAddingTag(false);
+      return;
+    }
+
+    const tagName = newTagName.trim();
+    setNewTagName("");
+    setIsAddingTag(false);
+
+    try {
+      // Add new tag to the backend
+      const response = await fetch('http://localhost:3000/tags', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: tagName }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save tag');
+      }
+
+      const newTag = await response.json();
+
+      // Update local state with new tag and its color
+      setAvailableTags(prev => [...prev, tagName]);
+      setTagColors(prev => ({ ...prev, [tagName]: newTag.color }));
+
+      // Set it as the current tag
+      isUserAction.current = true;
+      setTag(tagName);
+    } catch (error) {
+      console.error('Error adding tag:', error);
+    }
+  };
+
+  // Handle key down in new tag input
+  const handleNewTagKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleAddNewTag();
+    }
+    if (e.key === "Escape") {
+      setIsAddingTag(false);
+      setNewTagName("");
+    }
+  };
+
+  // Fetch tags with colors
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/tags');
+        if (!response.ok) {
+          throw new Error('Failed to fetch tags');
+        }
+        const data = await response.json();
+
+        // Create a dictionary of tag names to colors
+        const tagDict = {};
+        const tagNames = [];
+
+        data.forEach(tag => {
+          tagDict[tag.name] = tag.color;
+          tagNames.push(tag.name);
+        });
+
+        setAvailableTags(tagNames);
+        setTagColors(tagDict);
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+      }
+    };
+
+    fetchTags();
+  }, []);
+
   return (
     <div className={`home_sidebarContainer ${selectedEvent ? "open" : ""}`}>
       <div className="sidebar_header">
@@ -342,13 +471,56 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
             onChange={handleUserInput(setTitle)}
             placeholder="Enter title"
           />
-          {/* Date Input */}
-          <input
-            className="sidebar_date"
-            type="date"
-            value={date}
-            onChange={handleUserInput(setDate)}
-          />
+          {/* Date and Tag Inputs */}
+          <div className="sidebar_dateTagContainer">
+            <input
+              className="sidebar_date"
+              type="date"
+              value={date}
+              onChange={handleUserInput(setDate)}
+            />
+
+            {isAddingTag ? (
+              <div className="sidebar_newTagContainer">
+                <input
+                  type="text"
+                  value={newTagName}
+                  onChange={(e) => setNewTagName(e.target.value)}
+                  onKeyDown={handleNewTagKeyDown}
+                  onBlur={handleAddNewTag}
+                  autoFocus
+                  className="sidebar_tagInput"
+                  placeholder="New tag name"
+                />
+              </div>
+            ) : (
+              <div className="sidebar_tagDropdown">
+                <Dropdown
+                  options={[...availableTags, "Add tag..."]}
+                  defaultValue={tag} // This should now update correctly
+                  onChange={handleTagChange}
+                  renderOption={(option) => (
+                    <>
+                      {option !== "Add tag..." && (
+                        <span
+                          className="tag-color-indicator"
+                          style={{
+                            display: "inline-block",
+                            width: "12px",
+                            height: "12px",
+                            borderRadius: "50%",
+                            backgroundColor: tagColors[option] || "#C2E2C7",
+                            marginRight: "8px",
+                          }}
+                        />
+                      )}
+                      {option}
+                    </>
+                  )}
+                />
+              </div>
+            )}
+          </div>
           {/* Time Inputs */}
           <div className="sidebar_timeContainer">
             <input

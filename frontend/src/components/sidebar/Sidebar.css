@@ -46,9 +46,9 @@
 .sidebar_title {
     display: flex;
     margin-bottom: 1rem;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-family: 'Jetbrains Mono', monospace;
-    font-weight: bold;
+    font-weight: 600;
     border: none;
     background-color: white;
     padding: 0.5rem 1rem;
@@ -57,9 +57,8 @@
 
 .sidebar_location {
     display: flex;
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-family: 'Jetbrains Mono', monospace;
-    font-weight: 600;
     border: none;
     background-color: white;
     padding: 0.5rem 1rem;
@@ -78,9 +77,10 @@
 }
 
 .sidebar_date {
-    margin-bottom: 1rem;
+    margin-bottom: 0;
+    /* Override the existing margin */
     border: none;
-    font-size: 1.25rem;
+    font-size: 1rem;
     padding: 0.5rem 1rem;
     border-radius: 0.625rem;
     background-color: white;
@@ -89,7 +89,7 @@
 .sidebar_time {
     margin-bottom: 1rem;
     border: none;
-    font-size: 1.25rem;
+    font-size: 1rem;
     padding: 0.5rem 1rem;
     border-radius: 0.625rem;
     background-color: white;
@@ -104,7 +104,7 @@
 }
 
 .sidebar_timeContainer p {
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-family: 'Jetbrains Mono', monospace;
     font-weight: 600;
     margin: 0 0 1rem 0;
@@ -169,4 +169,39 @@
 
 .budget_net {
     margin-left: 1.25rem;
+}
+
+.sidebar_dateTagContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.sidebar_tagDropdown {
+    flex: 1;
+    min-width: 120px;
+}
+
+.sidebar_newTagContainer {
+    display: flex;
+    width: 100%;
+}
+
+.sidebar_tagInput {
+    display: flex;
+    width: 100%;
+    border: none;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.625rem;
+    background-color: white;
+    font-family: 'Jetbrains Mono', monospace;
+}
+
+.sidebar_tagInput:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #2684ff;
 }
