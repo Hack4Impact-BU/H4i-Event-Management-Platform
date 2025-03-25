@@ -38,6 +38,11 @@
     width: 3rem;
 }
 
+#closeIcon {
+    font-size: 2rem;
+    color: #000;
+}
+
 #addIcon {
     font-size: 2rem;
     color: #000;

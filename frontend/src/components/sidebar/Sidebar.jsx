@@ -6,8 +6,6 @@ import Tasks from "../task/Tasks";
 import Dropdown from "../dropdown/Dropdown";
 import TextareaAutosize from "react-textarea-autosize";
 import AddIcon from "@mui/icons-material/Add";
-import TextareaAutosize from "react-textarea-autosize";
-import Tasks from "../task/Tasks";
 import GoogleCalIcon from "../../assets/google_calendar_icon.svg";
 import "./Sidebar.css";
 
@@ -148,7 +146,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
     try {
       alert("Invite Sent!");
       console.log("sending invite");
-      const response = await fetch ("http://localhost:3000/sendInvite", {
+      const response = await fetch("http://localhost:3000/sendInvite", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -460,7 +458,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
           <CloseIcon id="closeIcon" />
         </IconButton>
         <IconButton id="calendarButton" onClick={sendInvite}>
-          <img src={GoogleCalIcon} id="calendarIcon"/>
+          <img src={GoogleCalIcon} id="calendarIcon" />
         </IconButton>
       </div>
       {eventData && (

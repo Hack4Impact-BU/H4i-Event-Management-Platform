@@ -2,11 +2,12 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const express = require('express');
 const Event = require('./models/event');
+const Tag = require('./models/tag');
 const fs = require('fs').promises;
 const path = require('path');
 const process = require('process');
-const {authenticate} = require('@google-cloud/local-auth');
-const {google} = require('googleapis');
+const { authenticate } = require('@google-cloud/local-auth');
+const { google } = require('googleapis');
 const cors = require('cors');
 
 const MONGO_URI = process.env.MONGO_URI;
@@ -18,12 +19,6 @@ mongoose.connect(MONGO_URI)
   .catch((err) => {
     console.error('MongoDB connection error:', err);
   });
-
-const express = require('express');
-const Event = require('./models/event');
-const Tag = require('./models/tag'); // Add these lines after your existing imports
-
-const cors = require('cors');
 
 const app = express();
 app.use(cors());
@@ -145,14 +140,14 @@ async function authorize(event) {
   return client;
 }
 
-async function sendEvent( event, auth ) {
+async function sendEvent(event, auth) {
   console.log(auth);
-  const calendar = google.calendar({version: 'v3', auth});
+  const calendar = google.calendar({ version: 'v3', auth });
   calendar.events.insert({
     auth: auth,
     calendarId: 'primary',
     resource: event,
-  }, function(err, event) {
+  }, function (err, event) {
     if (err) {
       console.log('There was an error contacting the Calendar service: ' + err);
       return;
