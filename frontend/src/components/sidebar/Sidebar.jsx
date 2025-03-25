@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
-import { IconButton } from "@mui/material";
+import { IconButton, SvgIcon } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import "./Sidebar.css";
 import Tasks from "../task/Tasks";
 import Dropdown from "../dropdown/Dropdown";
 import TextareaAutosize from "react-textarea-autosize";
 import AddIcon from "@mui/icons-material/Add";
+import TextareaAutosize from "react-textarea-autosize";
+import Tasks from "../task/Tasks";
+import GoogleCalIcon from "../../assets/google_calendar_icon.svg";
+import "./Sidebar.css";
 
 const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   // Local copy of the event including tasks.
@@ -138,7 +142,44 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
     } catch (error) {
       console.error("Error updating event:", error);
     }
-  };
+  }
+
+  const sendInvite = async () => {
+    try {
+      alert("Invite Sent!");
+      console.log("sending invite");
+      const response = await fetch ("http://localhost:3000/sendInvite", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          'summary': selectedEvent.title,
+          'location': selectedEvent.location,
+          'description': selectedEvent.description,
+          'start': {
+            'dateTime': `${selectedEvent.date}T${selectedEvent.time.start}:00-05:00`,
+            'timeZone': 'America/New_York'
+          },
+          'end': {
+            'dateTime': `${selectedEvent.date}T${selectedEvent.time.end}:00-05:00`,
+            'timeZone': 'America/New_York'
+          },
+        })
+      });
+      if (!response.ok) {
+        throw new Error("Failed to send calendar invite");
+      }
+
+    } catch (error) {
+      console.log('Error sending invite:', error);
+    }
+  }
+
+  useEffect(() => {
+    setNet(predictedBudget - actualSpent);
+  }, [predictedBudget, actualSpent]);
+
 
   // Callback to update the status of a specific task.
   const handleTaskStatusChange = async (taskId, newStatus) => {
@@ -414,9 +455,14 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
 
   return (
     <div className={`home_sidebarContainer ${selectedEvent ? "open" : ""}`}>
-      <IconButton id="closeIcon" onClick={closeSidebar}>
-        <CloseIcon id="closeButton" />
-      </IconButton>
+      <div className="sidebar_header">
+        <IconButton id="closeButton" onClick={closeSidebar}>
+          <CloseIcon id="closeIcon" />
+        </IconButton>
+        <IconButton id="calendarButton" onClick={sendInvite}>
+          <img src={GoogleCalIcon} id="calendarIcon"/>
+        </IconButton>
+      </div>
       {eventData && (
         <div className="sidebar_content">
           <TextareaAutosize

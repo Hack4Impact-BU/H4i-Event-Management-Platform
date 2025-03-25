@@ -23,17 +23,21 @@
     width: 100%;
 }
 
-#closeButton {
-    width: 3rem;
-    justify-self: flex-end;
-    align-self: flex-end;
+.sidebar_header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
 }
 
 #addButton {
     width: 3rem;
 }
 
-#closeIcon,
+#closeButton,
+#calendarButton {
+    width: 3rem;
+}
+
 #addIcon {
     font-size: 2rem;
     color: #000;
