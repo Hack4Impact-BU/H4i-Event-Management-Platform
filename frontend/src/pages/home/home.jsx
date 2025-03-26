@@ -60,7 +60,7 @@ const Home = () => {
             status: "Not Started"
           },
           {
-            name: "Finance Confirmation",
+            name: "Events Confirmation",
             status: "Not Started"
           }
         ],
