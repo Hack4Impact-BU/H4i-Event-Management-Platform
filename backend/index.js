@@ -99,8 +99,8 @@ app.post('/updateEvent', async (req, res) => {
 });
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
-const TOKEN_PATH = path.join(process.cwd(), 'credentials/token.json');
-const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials/credentials.json');
+const TOKEN_PATH = path.join(process.cwd(), 'token.json');
+const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
 
 async function loadSavedCredentialsIfExist() {
   try {
