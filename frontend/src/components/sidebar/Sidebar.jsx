@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { IconButton, SvgIcon } from "@mui/material";
+import { IconButton, Button } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import "./Sidebar.css";
 import Tasks from "../task/Tasks";
@@ -31,6 +31,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   const [availableTags, setAvailableTags] = useState(["general", "speaker event", "social", "workshop"]);
   const [tagColors, setTagColors] = useState({ general: "#C2E2C7" });
   const [calendarEventAdded, setCalendarEventAdded] = useState(false);
+  const [showCalendarConfirmation, setShowCalendarConfirmation] = useState(false);
 
   // Ref to track if update is from user or server
   const isUserAction = useRef(false);
@@ -452,16 +453,39 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
     fetchTags();
   }, []);
 
+
+  const confirmCalendarEvent = () => {
+    setShowCalendarConfirmation(true);
+  };
+
+  const handleCalendarConfirm = async () => {
+    // User confirmed; hide confirmation and send invite.
+    setShowCalendarConfirmation(false);
+    await sendInvite();
+  };
+
+  const handleCalendarCancel = () => {
+    // User cancelled; simply hide the confirmation.
+    setShowCalendarConfirmation(false);
+  };
+
   return (
     <div className={`home_sidebarContainer ${selectedEvent ? "open" : ""}`}>
       <div className="sidebar_header">
         <IconButton id="closeButton" onClick={closeSidebar}>
           <CloseIcon id="closeIcon" />
         </IconButton>
-        <IconButton id="calendarButton" onClick={sendInvite}>
+        <IconButton id="calendarButton" onClick={confirmCalendarEvent}>
           <img src={GoogleCalIcon} id="calendarIcon" />
         </IconButton>
       </div>
+      {showCalendarConfirmation && (
+        <div className="calendar_confirmation_prompt">
+          <p>Add Event to Calendar?</p>
+          <Button id="confirmation_button" variant="outlined" onClick={handleCalendarConfirm}>Confirm</Button>
+          <Button id="cancellation_button" variant="outlined" onClick={handleCalendarCancel}>Cancel</Button>
+        </div>
+      )}
       {calendarEventAdded && (
         <div className="event_confirmation_text">
           <h5 id="event_confirmation_text_inner">Event Added to Calendar</h5>
