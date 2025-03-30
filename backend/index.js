@@ -69,7 +69,7 @@ app.post('/updateEvent', async (req, res) => {
     }
 
     // Update time if provided
-    if (req.body.time) {
+    if (req.body.time.start && req.body.time.end) {
       event.time.start = req.body.time.start;
       event.time.end = req.body.time.end;
     }
