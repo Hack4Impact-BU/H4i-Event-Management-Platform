@@ -60,7 +60,7 @@ const Home = () => {
             status: "Not Started"
           },
           {
-            name: "Finance Confirmation",
+            name: "Events Confirmation",
             status: "Not Started"
           }
         ],
@@ -113,9 +113,15 @@ const Home = () => {
         <div className={`home_eventsContainer ${selectedEvent ? 'sidebar-open' : ''}`}>
           {events.map((event) => (
             <div
-              className='home_cardContainer'
+              className={`home_cardContainer ${selectedEvent && selectedEvent._id === event._id ? "selected-event" : ""}`}
               key={event._id}
               onClick={() => setSelectedEvent(event)}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-0.5rem)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
             >
               <EventCard event={event} />
             </div>

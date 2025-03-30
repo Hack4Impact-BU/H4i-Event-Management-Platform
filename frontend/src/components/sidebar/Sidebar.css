@@ -23,6 +23,17 @@
     width: 100%;
 }
 
+#event_confirmation_text_inner {
+    margin: 0px;
+    color: red;
+}
+
+.event_confirmation_text {
+    display: flex;
+    justify-content: right;
+    margin-bottom: 1rem;
+}
+
 .sidebar_header {
     display: flex;
     justify-content: space-between;
@@ -209,4 +220,30 @@
 .sidebar_tagInput:focus {
     outline: none;
     box-shadow: 0 0 0 2px #2684ff;
+}
+
+.calendar_confirmation_prompt {
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 1rem;
+    background-color: white;
+    border-radius: 0.625rem;
+    
+
+}
+
+#confirmation_button {
+    color: #000;
+    border-color: #000;
+    height: 2rem;
+    margin-top: 0.65rem;
+    font-family: 'Jetbrains Mono', monospace;
+}
+
+#cancellation_button {
+    color: red;
+    border-color: red;
+    height: 2rem;
+    margin-top: 0.65rem;
+    font-family: 'Jetbrains Mono', monospace;
 }

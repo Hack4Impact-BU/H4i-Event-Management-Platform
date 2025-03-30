@@ -69,7 +69,7 @@ app.post('/updateEvent', async (req, res) => {
     }
 
     // Update time if provided
-    if (req.body.time) {
+    if (req.body.time.start && req.body.time.end) {
       event.time.start = req.body.time.start;
       event.time.end = req.body.time.end;
     }
@@ -99,8 +99,8 @@ app.post('/updateEvent', async (req, res) => {
 });
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
-const TOKEN_PATH = path.join(process.cwd(), 'credentials/token.json');
-const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials/credentials.json');
+const TOKEN_PATH = path.join(process.cwd(), 'token.json');
+const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
 
 async function loadSavedCredentialsIfExist() {
   try {

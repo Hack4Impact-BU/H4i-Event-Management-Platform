@@ -10,6 +10,7 @@ body {
     padding-top: 4rem;
     transition: transform 0.3s ease;
     margin-top: 5rem;
+    margin-bottom: 2rem;
 }
 
 .home_container.sidebar-open {
@@ -21,12 +22,13 @@ body {
     flex-wrap: wrap;
     /* grid-template-columns: repeat(3, minmax(16rem, 1fr)); */
     gap: 3rem;
-    width: 63rem;
+    width: 67rem;
     transition: width 0.3s ease;
 }
 
 .home_eventsContainer.sidebar-open {
-    width: 41rem;
+    width: 50rem;
+
 }
 
 #filterButton,
@@ -52,4 +54,16 @@ body {
 
 .home_emptyDiv {
     width: 6rem;
+}
+
+.home_cardContainer.selected-event {
+    border-color: #D4A5A5;
+    
+}
+
+.home_cardContainer {
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+    border-radius: 1.4rem;
+    box-sizing: border-box;
 }
