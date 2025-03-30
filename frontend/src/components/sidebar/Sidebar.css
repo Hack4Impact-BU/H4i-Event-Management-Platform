@@ -23,6 +23,18 @@
     width: 100%;
 }
 
+#event_confirmation_text_inner {
+    margin: 0px;
+    padding: 5px;
+    color: red;
+}
+
+.event_confirmation_text {
+    display: flex;
+    justify-content: right;
+    padding-right: 10px;
+}
+
 .sidebar_header {
     display: flex;
     justify-content: space-between;

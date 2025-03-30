@@ -30,6 +30,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   const [newTagName, setNewTagName] = useState("");
   const [availableTags, setAvailableTags] = useState(["general", "speaker event", "social", "workshop"]);
   const [tagColors, setTagColors] = useState({ general: "#C2E2C7" });
+  const [calendarEventAdded, setCalendarEventAdded] = useState(false);
 
   // Ref to track if update is from user or server
   const isUserAction = useRef(false);
@@ -50,6 +51,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
       setDescription(selectedEvent.description);
       // Make sure we set the tag from the selected event, with a default fallback
       setTag(selectedEvent.tag || "general");
+      setCalendarEventAdded(false);
     }
   }, [selectedEvent]);
 
@@ -144,8 +146,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
 
   const sendInvite = async () => {
     try {
-      alert("Invite Sent!");
-      console.log("sending invite");
+      setCalendarEventAdded(true);
       const response = await fetch("http://localhost:3000/sendInvite", {
         method: "POST",
         headers: {
@@ -461,6 +462,11 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
           <img src={GoogleCalIcon} id="calendarIcon" />
         </IconButton>
       </div>
+      {calendarEventAdded && (
+        <div className="event_confirmation_text">
+          <h5 id="event_confirmation_text_inner">Event Added to Calendar</h5>
+        </div>
+      )}
       {eventData && (
         <div className="sidebar_content">
           <TextareaAutosize
