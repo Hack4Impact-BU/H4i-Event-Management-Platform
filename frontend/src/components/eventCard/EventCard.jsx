@@ -21,6 +21,32 @@ export default function EventCard({ event }) {
       .toUpperCase();
   };
 
+  // Format date in MM/DD/YYYY
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+
+    // Check if it's a Date object
+    if (dateStr instanceof Date && typeof dateStr.getTime === 'function') {
+      const month = (dateStr.getMonth() + 1).toString().padStart(2, '0');
+      const day = dateStr.getDate().toString().padStart(2, '0');
+      const year = dateStr.getFullYear();
+      return `${month}/${day}/${year}`;
+    }
+
+    // Handle string date format (assuming YYYY-MM-DD from the backend)
+    if (typeof dateStr === 'string') {
+      // Split the date string and rearrange components
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        // parts[0] is year, parts[1] is month, parts[2] is day
+        return `${parts[1]}/${parts[2]}/${parts[0]}`;
+      }
+    }
+
+    // Return the original value if format is unknown
+    return dateStr;
+  };
+
   const eventDate = event.dateTime ? new Date(event.dateTime) : event.date;
 
   return (
@@ -33,11 +59,7 @@ export default function EventCard({ event }) {
       </div>
       <div className="eventCard_body">
         <h1>{event.title}</h1>
-        <h2>
-          {eventDate instanceof Date && typeof eventDate.getTime === 'function'
-            ? eventDate.toLocaleDateString()
-            : eventDate}
-        </h2>
+        <h2>{formatDate(eventDate)}</h2>
       </div>
       <div className="eventCard_progressContainer">
         <div

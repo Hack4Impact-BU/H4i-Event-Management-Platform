@@ -610,7 +610,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
               <input
                 id="predictedBudget"
                 type="number"
-                value={predictedBudget}
+                value={predictedBudget === 0 ? "" : predictedBudget}
                 onChange={handleUserInput(setPredictedBudget)}
               />
             </div>
@@ -619,7 +619,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
               <input
                 id="actualSpent"
                 type="number"
-                value={actualSpent}
+                value={actualSpent === 0 ? "" : actualSpent}
                 onChange={handleUserInput(setActualSpent)}
               />
             </div>
@@ -634,7 +634,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
               <input
                 id="attendance"
                 type="number"
-                value={attendance}
+                value={attendance === 0 ? "" : attendance}
                 onChange={handleUserInput(setAttendance)}
               />
             </div>
