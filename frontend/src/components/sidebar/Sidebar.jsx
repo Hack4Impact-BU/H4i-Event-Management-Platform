@@ -154,7 +154,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          'summary': `🌍 ${selectedEvent.title}`,
+          'summary': `🌎 ${selectedEvent.title}`,
           'location': selectedEvent.location,
           'description': selectedEvent.description,
           'start': {
