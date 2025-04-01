@@ -151,7 +151,6 @@ async function authorize(event) {
 }
 
 async function sendEvent(event, auth) {
-  console.log(auth);
   const calendar = google.calendar({ version: 'v3', auth });
   calendar.events.insert({
     auth: auth,
