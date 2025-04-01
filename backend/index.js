@@ -51,14 +51,25 @@ app.post('/updateEvent', async (req, res) => {
       return res.status(404).json({ message: "Event not found" });
     }
 
-    // Update title, location, description, and tag
+    // Update basic fields
     event.title = req.body.title;
     event.location = req.body.location || "";
     event.description = req.body.description || "";
     event.tag = req.body.tag;
-    event.tagColor = req.body.tagColor; // Add this line to update the tag color
+    event.tagColor = req.body.tagColor;
 
-    // Update logistics fields
+    // Update the status based on date or use provided status
+    if (req.body.status) {
+      event.status = req.body.status;
+    } else {
+      const eventDate = new Date(req.body.date);
+      const today = new Date();
+      eventDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      event.status = eventDate >= today ? "upcoming" : "completed";
+    }
+
+    // Update other fields...
     event.budget.predicted = req.body.budget.predicted || 0;
     event.budget.actual = req.body.budget.actual || 0;
     event.attendance = req.body.attendance || 0;
@@ -74,8 +85,7 @@ app.post('/updateEvent', async (req, res) => {
       event.time.end = req.body.time.end;
     }
 
-    // IMPORTANT: Replace entire tasks array with the one from the request
-    // This ensures deletions are properly handled
+    // Handle tasks...
     if (req.body.tasks) {
       // Clear existing tasks
       event.tasks = [];
