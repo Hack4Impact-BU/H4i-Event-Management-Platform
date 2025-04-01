@@ -36,6 +36,11 @@ const EventSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  status: {
+    type: String,
+    enum: ["upcoming", "completed"],
+    default: "upcoming",
+  },
   tasks: {
     type: [
       {

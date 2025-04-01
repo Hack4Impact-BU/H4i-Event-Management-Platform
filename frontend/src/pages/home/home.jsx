@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import './Home.css';
 import EventCard from '../../components/eventCard/EventCard';
 import NavBar from '../../components/navbar/Navbar';
-import { IconButton } from '@mui/material';
+import { IconButton, Typography, Tabs, Tab, Box } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import Sidebar from '../../components/sidebar/Sidebar';
 
 const Home = () => {
   const [events, setEvents] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [activeTab, setActiveTab] = useState(0);
 
   const fetchEvents = async () => {
     try {
@@ -19,14 +22,63 @@ const Home = () => {
       }
       const data = await response.json();
       setEvents(data);
+
+      // Process events to determine status and sort them
+      processEvents(data);
+
       return data;
     } catch (error) {
       console.error('Error fetching events:', error);
     }
   };
 
+  // Process events to categorize as upcoming or past and sort them
+  const processEvents = (eventsList) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to beginning of day for accurate comparison
+
+    const upcoming = [];
+    const past = [];
+
+    eventsList.forEach(event => {
+      // Parse the event date
+      const eventDate = new Date(event.date);
+      eventDate.setHours(0, 0, 0, 0);
+
+      // Update event status based on date if not already set
+      if (!event.status) {
+        event.status = eventDate >= today ? "upcoming" : "completed";
+      }
+
+      // Sort into appropriate array
+      if (event.status === "upcoming") {
+        upcoming.push(event);
+      } else {
+        past.push(event);
+      }
+    });
+
+    // Sort upcoming events from earliest to latest
+    upcoming.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Sort past events from latest to earliest
+    past.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    setUpcomingEvents(upcoming);
+    setPastEvents(past);
+  };
+
   useEffect(() => {
     fetchEvents();
+
+    // Set up a daily interval to check and update event status
+    const updateInterval = setInterval(() => {
+      if (events.length > 0) {
+        processEvents(events);
+      }
+    }, 86400000); // 24 hours
+
+    return () => clearInterval(updateInterval);
   }, []);
 
   const closeSidebar = () => setSelectedEvent(null);
@@ -36,20 +88,33 @@ const Home = () => {
     setEvents(prevEvents =>
       prevEvents.map(event => event._id === updatedEvent._id ? updatedEvent : event)
     );
-    // Also update the selected event if it’s the one being updated.
+    // Also update the selected event if it's the one being updated.
     if (selectedEvent && selectedEvent._id === updatedEvent._id) {
       setSelectedEvent(updatedEvent);
     }
   };
 
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
   const addEvent = async () => {
     try {
       const today = new Date().toISOString();
-      const date = today.substring(0,10);
+      const date = today.substring(0, 10);
+
+      // Calculate if the event is upcoming or completed based on date
+      const eventDate = new Date(date);
+      eventDate.setHours(0, 0, 0, 0);
+      const todayDate = new Date();
+      todayDate.setHours(0, 0, 0, 0);
+      const status = eventDate >= todayDate ? "upcoming" : "completed";
+
       const event = {
         title: "New Event",
         location: "",
         description: "",
+        status: status, // Add status field
         tasks: [
           {
             name: "Room Confirmation",
@@ -89,12 +154,12 @@ const Home = () => {
       fetchEvents().then(events => {
         setSelectedEvent(events[events.length - 1]);
       });
+      // Switch to upcoming tab when adding a new event
+      setActiveTab(0);
     } catch (error) {
       console.error("Error adding event", error);
     }
   }
-
-
 
   return (
     <>
@@ -106,27 +171,79 @@ const Home = () => {
             <FilterAltIcon id="filterIcon" />
           </IconButton>
           <IconButton id="addButton" onClick={addEvent}>
-            <AddIcon id="addIcon"/>
+            <AddIcon id="addIcon" />
           </IconButton>
         </div>
 
-        <div className={`home_eventsContainer ${selectedEvent ? 'sidebar-open' : ''}`}>
-          {events.map((event) => (
-            <div
-              className={`home_cardContainer ${selectedEvent && selectedEvent._id === event._id ? "selected-event" : ""}`}
-              key={event._id}
-              onClick={() => setSelectedEvent(event)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-0.5rem)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
+        <div className={`home_eventsContent ${selectedEvent ? 'sidebar-open' : ''}`}>
+          <Box className="tabs-container">
+            <Tabs
+              value={activeTab}
+              onChange={handleTabChange}
+              className="event-tabs"
+              indicatorColor="primary"
+              textColor="primary"
             >
-              <EventCard event={event} />
+              <Tab label="Upcoming Events" className="event-tab" />
+              <Tab label="Past Events" className="event-tab" />
+            </Tabs>
+          </Box>
+
+          {/* Upcoming Events Tab */}
+          {activeTab === 0 && (
+            <div className="events_grid">
+              {upcomingEvents.length > 0 ? (
+                upcomingEvents.map((event) => (
+                  <div
+                    className={`home_cardContainer ${selectedEvent && selectedEvent._id === event._id ? "selected-event" : ""}`}
+                    key={event._id}
+                    onClick={() => setSelectedEvent(event)}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-0.5rem)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    <EventCard event={event} />
+                  </div>
+                ))
+              ) : (
+                <Typography className="no_events_message">
+                  No upcoming events
+                </Typography>
+              )}
             </div>
-          ))}
+          )}
+
+          {/* Past Events Tab */}
+          {activeTab === 1 && (
+            <div className="events_grid">
+              {pastEvents.length > 0 ? (
+                pastEvents.map((event) => (
+                  <div
+                    className={`home_cardContainer ${selectedEvent && selectedEvent._id === event._id ? "selected-event" : ""}`}
+                    key={event._id}
+                    onClick={() => setSelectedEvent(event)}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-0.5rem)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    <EventCard event={event} />
+                  </div>
+                ))
+              ) : (
+                <Typography className="no_events_message">
+                  No past events
+                </Typography>
+              )}
+            </div>
+          )}
         </div>
+
         <div className='home_emptyDiv'></div>
       </div>
 
