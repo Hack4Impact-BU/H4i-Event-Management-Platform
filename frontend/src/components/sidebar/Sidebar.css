@@ -149,6 +149,8 @@
 
 .sidebar_links {
     margin-top: 2rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #a0a0a0;
 }
 
 .sidebar_budget {
@@ -228,8 +230,6 @@
     margin-bottom: 1rem;
     background-color: white;
     border-radius: 0.625rem;
-    
-
 }
 
 #confirmation_button {
@@ -245,5 +245,58 @@
     border-color: red;
     height: 2rem;
     margin-top: 0.65rem;
+    font-family: 'Jetbrains Mono', monospace;
+}
+
+.event_deletion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.delete_event_prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1rem;
+    background-color: white;
+    border-radius: 0.625rem;
+    width: 35rem;
+}
+
+#delete_event_button {
+    width: 20rem;
+    height: 2.5rem;
+    border: 2px solid red;
+    color: red;
+    font-size: 20px;
+    margin: none;
+}
+
+.button_field {
+    margin-bottom: 1rem;
+    padding: none;
+    width: 35rem;
+    /* border-style: solid; */
+    display: flex;
+    justify-content: space-evenly;
+}
+
+#confirmation_button2 {
+    color: white;
+    border: 2px solid white;
+    background-color: red;
+    width: 12rem;
+    height: 3rem;
+    /* margin-top: 0.65rem; */
+    font-family: 'Jetbrains Mono', monospace;
+}
+
+#cancellation_button2 {
+    color: #000;
+    border-color: #000;
+    width: 12rem;
+    height: 3rem;
+    /* margin-top: 0.65rem; */
     font-family: 'Jetbrains Mono', monospace;
 }

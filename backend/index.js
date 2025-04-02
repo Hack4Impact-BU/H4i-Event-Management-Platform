@@ -151,7 +151,6 @@ async function authorize(event) {
 }
 
 async function sendEvent(event, auth) {
-  console.log(auth);
   const calendar = google.calendar({ version: 'v3', auth });
   calendar.events.insert({
     auth: auth,
@@ -299,6 +298,19 @@ app.post('/tags', async (req, res) => {
 
     await tag.save();
     res.status(201).json(tag);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.post('/deleteEvent', async (req, res) => {
+  try {
+    const response = await Event.deleteOne({ _id: req.body._id });
+    if (!response) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    res.status(200).send(response);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

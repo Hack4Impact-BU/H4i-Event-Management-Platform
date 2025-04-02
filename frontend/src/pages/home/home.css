@@ -58,13 +58,13 @@ body {
 }
 
 .home_cardContainer.selected-event {
-    border-color: #D4A5A5;
+    border-color: #80d1c8;
 
 }
-
+    
 .home_cardContainer {
     transition: all 0.3s ease;
-    border: 3px solid transparent;
+    border: 7px solid transparent;
     border-radius: 1.4rem;
     box-sizing: border-box;
 }
