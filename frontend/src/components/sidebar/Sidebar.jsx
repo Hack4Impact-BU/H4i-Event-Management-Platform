@@ -668,9 +668,9 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
         <Button id="delete_event_button" variant="outlined" onClick={confirmDeleteEvent}>DELETE TASK</Button>
         {isDeletingEvent && (
           <div className="delete_event_prompt">
-            <h3>Add Event to Calendar?</h3>
+            <h3>Delete Event?</h3>
             <div className="button_field">
-              <Button id="confirmation_button2" variant="outlined" onClick={handleDeleteConfirm}>Confirm Deletion</Button>
+              <Button id="confirmation_button2" variant="outlined" onClick={handleDeleteConfirm}>Confirm Delete</Button>
               <Button id="cancellation_button2" variant="outlined" onClick={handleDeleteCancel}>Cancel</Button>
             </div>
           </div>
