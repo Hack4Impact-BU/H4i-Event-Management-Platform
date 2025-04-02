@@ -32,6 +32,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   const [tagColors, setTagColors] = useState({ general: "#C2E2C7" });
   const [calendarEventAdded, setCalendarEventAdded] = useState(false);
   const [showCalendarConfirmation, setShowCalendarConfirmation] = useState(false);
+  const [isDeletingEvent, setIsDeletingEvent] = useState(false);
 
   // Ref to track if update is from user or server
   const isUserAction = useRef(false);
@@ -53,6 +54,8 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
       // Make sure we set the tag from the selected event, with a default fallback
       setTag(selectedEvent.tag || "general");
       setCalendarEventAdded(false);
+      setShowCalendarConfirmation(false);
+      setIsDeletingEvent(false);
     }
   }, [selectedEvent]);
 
@@ -469,6 +472,18 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
     setShowCalendarConfirmation(false);
   };
 
+  const confirmDeleteEvent = () => {
+    setIsDeletingEvent(true);
+  }
+
+  const handleDeleteConfirm = async() => {
+    setIsDeletingEvent(false);
+  }
+
+  const handleDeleteCancel = () => {
+    setIsDeletingEvent(false);
+  }
+
   return (
     <div className={`home_sidebarContainer ${selectedEvent ? "open" : ""}`}>
       <div className="sidebar_header">
@@ -649,6 +664,18 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
           </div>
         </div>
       )}
+      <div className="event_deletion">
+        <Button id="delete_event_button" variant="outlined" onClick={confirmDeleteEvent}>DELETE TASK</Button>
+        {isDeletingEvent && (
+          <div className="delete_event_prompt">
+            <h3>Add Event to Calendar?</h3>
+            <div className="button_field">
+              <Button id="confirmation_button2" variant="outlined" onClick={handleDeleteConfirm}>Confirm Deletion</Button>
+              <Button id="cancellation_button2" variant="outlined" onClick={handleDeleteCancel}>Cancel</Button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
