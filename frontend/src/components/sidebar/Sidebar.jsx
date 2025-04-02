@@ -472,8 +472,25 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
     setShowCalendarConfirmation(false);
   };
 
-  const confirmDeleteEvent = () => {
+  const confirmDeleteEvent = async () => {
     setIsDeletingEvent(true);
+    try {
+      const response = await fetch('http://localhost:3000/deleteEvent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ _id: selectedEvent._id })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch tags');
+      }
+      
+      const data = await response.json();
+    } catch (error) {
+      console.error("Error deleting task", error);
+    }
   }
 
   const handleDeleteConfirm = async() => {

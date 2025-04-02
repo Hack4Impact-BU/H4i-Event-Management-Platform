@@ -303,6 +303,19 @@ app.post('/tags', async (req, res) => {
   }
 });
 
+app.post('/deleteEvent', async (req, res) => {
+  try {
+    const response = await Event.deleteOne({ _id: req.body._id });
+    if (!response) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
