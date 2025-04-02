@@ -96,6 +96,7 @@ const Home = () => {
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
+    setSelectedEvent(null);
   };
 
   const addEvent = async () => {
