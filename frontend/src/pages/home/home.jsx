@@ -81,14 +81,15 @@ const Home = () => {
   const closeSidebar = () => setSelectedEvent(null);
 
   // Callback to update an event in the events array
-  const handleUpdateEvent = (updatedEvent) => {
-    setEvents(prevEvents =>
-      prevEvents.map(event => event._id === updatedEvent._id ? updatedEvent : event)
-    );
+  const handleUpdateEvent = async (updatedEvent) => {
+    // setEvents(prevEvents =>
+    //   prevEvents.map(event => event._id === updatedEvent._id ? updatedEvent : event)
+    // );
     // Also update the selected event if it's the one being updated.
-    if (selectedEvent && selectedEvent._id === updatedEvent._id) {
-      setSelectedEvent(updatedEvent);
-    }
+    // if (selectedEvent && selectedEvent._id === updatedEvent._id) {
+    //   setSelectedEvent(updatedEvent);
+    // }
+    fetchEvents();
   };
 
   const handleTabChange = (event, newValue) => {

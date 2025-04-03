@@ -474,6 +474,11 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
 
   const confirmDeleteEvent = async () => {
     setIsDeletingEvent(true);
+  }
+
+  const handleDeleteConfirm = async() => {
+    setIsDeletingEvent(false);
+    closeSidebar();
     try {
       const response = await fetch('http://localhost:3000/deleteEvent', {
         method: 'POST',
@@ -488,13 +493,13 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
       }
       
       const data = await response.json();
+
+      if (onUpdateEvent) {
+        onUpdateEvent(data);
+      }
     } catch (error) {
       console.error("Error deleting task", error);
     }
-  }
-
-  const handleDeleteConfirm = async() => {
-    setIsDeletingEvent(false);
   }
 
   const handleDeleteCancel = () => {
