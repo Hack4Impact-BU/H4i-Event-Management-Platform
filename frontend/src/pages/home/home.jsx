@@ -42,13 +42,10 @@ const Home = () => {
 
     eventsList.forEach(event => {
       // Parse the event date
-      const eventDate = new Date(event.date);
-      eventDate.setHours(0, 0, 0, 0);
+      const eventDate = new Date(`${event.date}T00:00:00`);
 
-      // Update event status based on date if not already set
-      if (!event.status) {
-        event.status = eventDate >= today ? "upcoming" : "completed";
-      }
+      // Update event status
+      event.status = eventDate >= today ? "upcoming" : "completed";
 
       // Sort into appropriate array
       if (event.status === "upcoming") {
@@ -105,8 +102,7 @@ const Home = () => {
       const date = today.substring(0, 10);
 
       // Calculate if the event is upcoming or completed based on date
-      const eventDate = new Date(date);
-      eventDate.setHours(0, 0, 0, 0);
+      const eventDate = new Date(`${date}T00:00:00`);
       const todayDate = new Date();
       todayDate.setHours(0, 0, 0, 0);
       const status = eventDate >= todayDate ? "upcoming" : "completed";
