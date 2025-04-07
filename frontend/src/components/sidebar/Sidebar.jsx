@@ -490,12 +490,10 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
         console.error("Failed to delete task");
       }
 
-      const updatedLinks = eventData.links.map((link) =>
-        link._id !== linkId ? link : ""
-      );
+      const updatedLinks = eventData.links.filter(link => link._id !== linkId);
+      const updatedEventData = { ...eventData, links: updatedLinks };
 
-      const updatedEventData = { ...eventData, updatedLinks };
-      console.log(updatedEventData);
+      setEventData(updatedEventData);
 
       if (onUpdateEvent) {
         onUpdateEvent(updatedEventData);
