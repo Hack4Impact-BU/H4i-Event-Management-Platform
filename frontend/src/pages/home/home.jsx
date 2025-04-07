@@ -6,6 +6,7 @@ import { IconButton, Typography, Tabs, Tab, Box } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import Sidebar from '../../components/sidebar/Sidebar';
+import Filter from '../../components/filter/Filter';
 
 const Home = () => {
   const [events, setEvents] = useState([]);
@@ -15,6 +16,16 @@ const Home = () => {
   const [activeTab, setActiveTab] = useState(0);
   const sidebarRef = useRef(null);
 
+  // Add new state for filter functionality
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [availableTags, setAvailableTags] = useState([]);
+  const [selectedFilters, setSelectedFilters] = useState({});
+  const [filteredUpcomingEvents, setFilteredUpcomingEvents] = useState([]);
+  const [filteredPastEvents, setFilteredPastEvents] = useState([]);
+
+  // Add state to track the filter button element
+  const [filterAnchorEl, setFilterAnchorEl] = useState(null);
+
   const fetchEvents = async () => {
     try {
       const response = await fetch('http://localhost:3000/events');
@@ -23,6 +34,19 @@ const Home = () => {
       }
       const data = await response.json();
       setEvents(data);
+
+      // Extract all unique tags from events
+      const tags = [...new Set(data.map(event => event.tag || 'general').filter(Boolean))];
+      setAvailableTags(tags);
+
+      // Initialize filters with all tags NOT selected if they haven't been set yet
+      if (Object.keys(selectedFilters).length === 0) {
+        const initialFilters = {};
+        tags.forEach(tag => {
+          initialFilters[tag] = false;
+        });
+        setSelectedFilters(initialFilters);
+      }
 
       // Process events to determine status and sort them
       processEvents(data);
@@ -64,10 +88,62 @@ const Home = () => {
 
     setUpcomingEvents(upcoming);
     setPastEvents(past);
+
+    // Apply existing filters to these events
+    applyFilters(upcoming, past, selectedFilters);
+  };
+
+  // Apply filters to events
+  const applyFilters = (upcoming = upcomingEvents, past = pastEvents, filters = selectedFilters) => {
+    // Check if any filters are selected (true)
+    const hasActiveFilters = Object.values(filters).some(value => value);
+
+    if (!hasActiveFilters) {
+      // If no filters are active, show all events
+      setFilteredUpcomingEvents(upcoming);
+      setFilteredPastEvents(past);
+      return;
+    }
+
+    // Filter events based on selected filters
+    const filteredUpcoming = upcoming.filter(event =>
+      filters[event.tag || 'general']
+    );
+
+    const filteredPast = past.filter(event =>
+      filters[event.tag || 'general']
+    );
+
+    setFilteredUpcomingEvents(filteredUpcoming);
+    setFilteredPastEvents(filteredPast);
+  };
+
+  // Handle applying filters
+  const handleApplyFilters = (newFilters) => {
+    setSelectedFilters(newFilters);
+    applyFilters(upcomingEvents, pastEvents, newFilters);
   };
 
   useEffect(() => {
     fetchEvents();
+
+    // Fetch all available tags from the server
+    const fetchTags = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/tags');
+        if (!response.ok) {
+          throw new Error('Failed to fetch tags');
+        }
+        const data = await response.json();
+
+        // Extract tag names for filter options
+        setAvailableTags(data.map(tag => tag.name));
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+      }
+    };
+
+    fetchTags();
 
     // Set up a daily interval to check and update event status
     const updateInterval = setInterval(() => {
@@ -78,6 +154,11 @@ const Home = () => {
 
     return () => clearInterval(updateInterval);
   }, []);
+
+  // Update filtered events when filters or events change
+  useEffect(() => {
+    applyFilters();
+  }, [selectedFilters, upcomingEvents, pastEvents]);
 
   // Function to handle clicks outside the sidebar
   useEffect(() => {
@@ -110,13 +191,6 @@ const Home = () => {
 
   // Callback to update an event in the events array
   const handleUpdateEvent = async (updatedEvent) => {
-    // setEvents(prevEvents =>
-    //   prevEvents.map(event => event._id === updatedEvent._id ? updatedEvent : event)
-    // );
-    // Also update the selected event if it's the one being updated.
-    // if (selectedEvent && selectedEvent._id === updatedEvent._id) {
-    //   setSelectedEvent(updatedEvent);
-    // }
     fetchEvents();
   };
 
@@ -187,13 +261,28 @@ const Home = () => {
     }
   }
 
+  // Updated toggle filter function to include anchor element
+  const toggleFilter = (event) => {
+    if (isFilterOpen) {
+      setFilterAnchorEl(null);
+      setIsFilterOpen(false);
+    } else {
+      setFilterAnchorEl(event.currentTarget);
+      setIsFilterOpen(true);
+    }
+  };
+
   return (
     <>
       <NavBar />
 
       <div className={`home_container ${selectedEvent ? 'sidebar-open' : ''}`}>
         <div className="home_buttonContainer">
-          <IconButton id="filterButton">
+          <IconButton
+            id="filterButton"
+            onClick={toggleFilter}
+            className={Object.values(selectedFilters).some(v => v) ? "filter-active" : ""}
+          >
             <FilterAltIcon id="filterIcon" />
           </IconButton>
           <IconButton id="addButton" onClick={addEvent}>
@@ -218,8 +307,8 @@ const Home = () => {
           {/* Upcoming Events Tab */}
           {activeTab === 0 && (
             <div className="events_grid">
-              {upcomingEvents.length > 0 ? (
-                upcomingEvents.map((event) => (
+              {filteredUpcomingEvents.length > 0 ? (
+                filteredUpcomingEvents.map((event) => (
                   <div
                     className={`home_cardContainer ${selectedEvent && selectedEvent._id === event._id ? "selected-event" : ""}`}
                     key={event._id}
@@ -236,7 +325,7 @@ const Home = () => {
                 ))
               ) : (
                 <Typography className="no_events_message">
-                  No upcoming events
+                  No upcoming events{Object.values(selectedFilters).some(v => v) ? " matching selected filters" : ""}
                 </Typography>
               )}
             </div>
@@ -245,8 +334,8 @@ const Home = () => {
           {/* Past Events Tab */}
           {activeTab === 1 && (
             <div className="events_grid">
-              {pastEvents.length > 0 ? (
-                pastEvents.map((event) => (
+              {filteredPastEvents.length > 0 ? (
+                filteredPastEvents.map((event) => (
                   <div
                     className={`home_cardContainer ${selectedEvent && selectedEvent._id === event._id ? "selected-event" : ""}`}
                     key={event._id}
@@ -263,7 +352,7 @@ const Home = () => {
                 ))
               ) : (
                 <Typography className="no_events_message">
-                  No past events
+                  No past events{Object.values(selectedFilters).some(v => v) ? " matching selected filters" : ""}
                 </Typography>
               )}
             </div>
@@ -278,6 +367,15 @@ const Home = () => {
         closeSidebar={closeSidebar}
         onUpdateEvent={handleUpdateEvent}
         ref={sidebarRef}
+      />
+
+      <Filter
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        availableTags={availableTags}
+        selectedFilters={selectedFilters}
+        onApplyFilters={handleApplyFilters}
+        anchorEl={filterAnchorEl}
       />
     </>
   );
