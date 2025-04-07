@@ -151,6 +151,7 @@
     margin-top: 2rem;
     margin-bottom: 1.5rem;
     border-bottom: 2px solid #a0a0a0;
+    padding-bottom: 2rem;
 }
 
 .sidebar_budget {
@@ -324,7 +325,7 @@
 }
 
 .link_assignee_dropdown {
-    width: 200px;
+    width: 20rem;
     border-radius: 4px;
     display: flex;
     align-items: center;
@@ -361,5 +362,19 @@
 .link_input_container {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+}
+
+#delete_link_button {
+    margin: 1px;
+    height: 2.5rem;
+    width: 15rem;
+    color: red;
+    border: 2px solid red;
+}
+
+.delete_button_container {
+    margin-top: 15px;
+    display: flex;
     justify-content: center;
 }

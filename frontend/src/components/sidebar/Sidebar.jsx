@@ -837,7 +837,9 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
                         />
                       </div>
                     </div>
-                    <Button id="delete_link_button" variant="outlined" onClick={() => deleteLink(link._id)}>Delete Link</Button>
+                    <div className="delete_button_container">
+                      <Button id="delete_link_button" variant="outlined" onClick={() => deleteLink(link._id)}>Delete Link</Button>
+                    </div>
                   </div>
                 </AccordionDetails>
               </Accordion>
