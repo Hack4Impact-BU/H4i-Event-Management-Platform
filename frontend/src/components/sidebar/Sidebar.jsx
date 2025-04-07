@@ -863,7 +863,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
         </div>
       )}
       <div className="event_deletion">
-        <Button id="delete_event_button" variant="outlined" onClick={confirmDeleteEvent}>DELETE TASK</Button>
+        <Button id="delete_event_button" variant="outlined" onClick={confirmDeleteEvent}>DELETE EVENT</Button>
         {isDeletingEvent && (
           <div className="delete_event_prompt">
             <h3>Delete Event?</h3>
