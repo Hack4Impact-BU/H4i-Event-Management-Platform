@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { IconButton, Button } from "@mui/material";
+import { IconButton, Button, Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import "./Sidebar.css";
 import Tasks from "../task/Tasks";
 import Dropdown from "../dropdown/Dropdown";
 import TextareaAutosize from "react-textarea-autosize";
 import AddIcon from "@mui/icons-material/Add";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import GoogleCalIcon from "../../assets/google_calendar_icon.svg";
 import "./Sidebar.css";
 
@@ -33,6 +34,10 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   const [calendarEventAdded, setCalendarEventAdded] = useState(false);
   const [showCalendarConfirmation, setShowCalendarConfirmation] = useState(false);
   const [isDeletingEvent, setIsDeletingEvent] = useState(false);
+  const [isAddingLink, setIsAddingLink] = useState(false);
+  const [newLinkName, setNewLinkName] = useState("");
+  const [newLinkURL, setNewLinkURL] = useState("");
+  const [newLinkAssignee, setNewLinkAssignee] = useState("Director of Operations");
 
   // Ref to track if update is from user or server
   const isUserAction = useRef(false);
@@ -56,6 +61,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
       setCalendarEventAdded(false);
       setShowCalendarConfirmation(false);
       setIsDeletingEvent(false);
+      setIsAddingLink(false);
     }
   }, [selectedEvent]);
 
@@ -366,6 +372,120 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
       console.error("Error deleting task:", error);
     }
   };
+
+  const handleAddLink = () => {
+    setNewLinkName("");
+    setNewLinkURL("");
+    setNewLinkAssignee("");
+    setIsAddingLink(true);
+  }
+
+  const addNewLink = async () => {
+    if (newLinkName.trim() === "") {
+      return;
+    }
+
+    const linkName = newLinkName;
+    const linkURL = newLinkURL;
+    const linkAssignee = newLinkAssignee;
+    setNewLinkName("");
+    setNewLinkURL("");
+    setNewLinkAssignee("Director of Operations");
+    setIsAddingLink(false);
+
+    const newLink = {
+      name: linkName,
+      url: linkURL,
+      assignee: linkAssignee,
+    };
+
+    const updatedLinks = [...eventData.links, newLink];
+
+    try {
+      const response = await fetch("http://localhost:3000/updateEvent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          _id: eventData._id,
+          title: title,
+          location: location,
+          description: description,
+          tasks: eventData.tasks,
+          tag: tag,
+          budget: {
+            predicted: predictedBudget,
+            actual: actualSpent,
+          },
+          attendance: attendance,
+          date: date,
+          time: {
+            start: startTime,
+            end: endTime,
+          },
+          links: updatedLinks,
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update event with new link");
+      }
+
+      const data = await response.json();
+
+      isUserAction.current = false;
+      setEventData(data);
+
+      if (onUpdateEvent) {
+        onUpdateEvent(data);
+      }
+    } catch (error) {
+      console.error("Error adding new link:", error);
+    }
+  }
+
+  const handleNewLinkKeyDown = (e) => {
+    if (e.key === "Enter") {
+      addNewLink();
+    }
+  };
+
+  const handleAssigneeChange = async (linkId, newAssignee) => {
+    console.log("linkId", linkId)
+    console.log("newAssignee", newAssignee);
+    isUserAction.current = true;
+
+    console.log(eventData.links);
+
+    const updatedLinks = eventData.links.map((link) =>
+      link._id !== linkId ? { ...link, assignee: newAssignee } : link
+    );
+    console.log(updatedLinks);
+    const updatedEventData = { ...eventData, links: updatedLinks };
+    console.log(updatedEventData);
+    setEventData(updatedEventData);
+
+    try {
+      const response = await fetch("http://localhost:3000/updateAssignee", {
+        method: "POST", 
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ linkId, newAssignee }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to update assignee");
+      }
+
+      if (onUpdateEvent) {
+        onUpdateEvent(updatedEventData);
+      }
+    } catch (error) {
+      console.error("Error updating assignee", error);
+    }
+  }
 
   // Handle tag change
   const handleTagChange = (newTag) => {
@@ -679,10 +799,84 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
           <div className="sidebar_links">
             <h2 className="sidebar_subtitle">Files</h2>
             {eventData.links && eventData.links.map((link, index) => (
-              <a key={index} href={link} target="_blank" rel="noreferrer">
-                {link}
-              </a>
+              <Accordion id="link_container" key={index}>
+                <AccordionSummary
+                expandIcon={<ExpandMoreIcon/>}
+                >
+                  <h3>{link.name}</h3>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <div>
+                    <p>
+                      URL: <a href={link.url} target="_blank">{link.url}</a>
+                    </p>
+                    <div>
+                      Assignee: 
+                      <Dropdown
+                        options={["Director of Operations", "Community", "Treasurer"]}
+                        defaultValue={link.assignee}
+                        onChange={(val) => handleAssigneeChange(link._id, val) }
+                      />
+                    </div>
+                  </div>
+                </AccordionDetails>
+              </Accordion>
             ))}
+            { isAddingLink ? (
+              <>
+                <input
+                  type="text"
+                  value={newLinkName}
+                  onChange={(e) => setNewLinkName(e.target.value)}
+                  // onKeyDown={handleNewLinkKeyDown}
+                  // onBlur={handleNewLinkBlur}
+                  autoFocus
+                  className="sidebar_taskInput"
+                  placeholder="Name"
+                />
+                <input
+                  type="text"
+                  value={newLinkURL}
+                  onChange={(e) => setNewLinkURL(e.target.value)}
+                  // onKeyDown={handleNewLinkKeyDown}
+                  // onBlur={handleNewLinkBlur}
+                  autoFocus
+                  className="sidebar_taskInput"
+                  placeholder="URL"
+                />
+                {/* <input
+                  type="text"
+                  value={newLinkAssignee}
+                  onChange={(e) => setNewLinkAssignee(e.target.value)}
+                  // onKeyDown={handleNewLinkKeyDown}
+                  // onBlur={handleNewLinkBlur}
+                  autoFocus
+                  className="sidebar_taskInput"
+                  placeholder="Assignee"
+                /> */}
+                <div>
+                  <p>Assignee</p>
+                  <Dropdown
+                    options={["Director of Operations", "Community", "Treasurer"]}
+                    defaultValue="Director of Operations"
+                    onChange={(e) => { setNewLinkAssignee(e) }}
+                  />
+                </div>
+                <button onClick={addNewLink}>
+                  Submit
+                </button>
+                <button onClick={() => setIsAddingLink(false)}>
+                  Cancel
+                </button>
+              </>
+              
+            ) : (
+              <IconButton onClick={handleAddLink} id="addButton">
+                <AddIcon id="addIcon" />
+              </IconButton>
+            )
+
+            }
           </div>
         </div>
       )}
