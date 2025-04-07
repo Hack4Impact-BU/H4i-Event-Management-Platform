@@ -445,12 +445,6 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
     }
   }
 
-  const handleNewLinkKeyDown = (e) => {
-    if (e.key === "Enter") {
-      addNewLink();
-    }
-  };
-
   const handleAssigneeChange = async (linkId, newAssignee) => {
     isUserAction.current = true;
 
@@ -478,6 +472,34 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
       }
     } catch (error) {
       console.error("Error updating assignee", error);
+    }
+  }
+
+  const deleteLink = async (linkId) => {
+    try {
+      const eventId = selectedEvent._id;
+      const response = await fetch("http://localhost:3000/deleteLink", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ eventId, linkId })
+      });
+
+      if (!response.ok) {
+        console.error("Failed to delete task");
+      }
+
+      const updatedLinks = eventData.links.filter(link => link._id !== linkId);
+      const updatedEventData = { ...eventData, links: updatedLinks };
+
+      setEventData(updatedEventData);
+
+      if (onUpdateEvent) {
+        onUpdateEvent(updatedEventData);
+      }
+    } catch (error) {
+      console.error("Error deleting task", error);
     }
   }
 
@@ -815,6 +837,9 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
                         />
                       </div>
                     </div>
+                    <div className="delete_button_container">
+                      <Button id="delete_link_button" variant="outlined" onClick={() => deleteLink(link._id)}>Delete Link</Button>
+                    </div>
                   </div>
                 </AccordionDetails>
               </Accordion>
@@ -863,7 +888,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
         </div>
       )}
       <div className="event_deletion">
-        <Button id="delete_event_button" variant="outlined" onClick={confirmDeleteEvent}>DELETE TASK</Button>
+        <Button id="delete_event_button" variant="outlined" onClick={confirmDeleteEvent}>DELETE EVENT</Button>
         {isDeletingEvent && (
           <div className="delete_event_prompt">
             <h3>Delete Event?</h3>
