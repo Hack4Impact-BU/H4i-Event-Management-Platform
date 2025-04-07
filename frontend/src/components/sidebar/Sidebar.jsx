@@ -381,7 +381,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   }
 
   const addNewLink = async () => {
-    if (newLinkName.trim() === "") {
+    if (newLinkName.trim() === "" || newLinkURL.trim() === "") {
       return;
     }
 
@@ -452,18 +452,12 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   };
 
   const handleAssigneeChange = async (linkId, newAssignee) => {
-    console.log("linkId", linkId)
-    console.log("newAssignee", newAssignee);
     isUserAction.current = true;
 
-    console.log(eventData.links);
-
     const updatedLinks = eventData.links.map((link) =>
-      link._id !== linkId ? { ...link, assignee: newAssignee } : link
+      link._id === linkId ? { ...link, assignee: newAssignee } : link
     );
-    console.log(updatedLinks);
     const updatedEventData = { ...eventData, links: updatedLinks };
-    console.log(updatedEventData);
     setEventData(updatedEventData);
 
     try {
@@ -802,73 +796,61 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
               <Accordion id="link_container" key={index}>
                 <AccordionSummary
                 expandIcon={<ExpandMoreIcon/>}
+                id="link_title"
                 >
-                  <h3>{link.name}</h3>
+                  <h2>{link.name}</h2>  
                 </AccordionSummary>
-                <AccordionDetails>
+                <AccordionDetails id="link_details_container">
                   <div>
                     <p>
                       URL: <a href={link.url} target="_blank">{link.url}</a>
                     </p>
-                    <div>
-                      Assignee: 
-                      <Dropdown
-                        options={["Director of Operations", "Community", "Treasurer"]}
-                        defaultValue={link.assignee}
-                        onChange={(val) => handleAssigneeChange(link._id, val) }
-                      />
+                    <div className="link_assignee_container">
+                      <p>Assignee:</p>
+                      <div className="link_assignee_dropdown">
+                        <Dropdown
+                          options={["Director of Operations", "Community", "Treasurer"]}
+                          defaultValue={link.assignee}
+                          onChange={(val) => handleAssigneeChange(link._id, val) }
+                        />
+                      </div>
                     </div>
                   </div>
                 </AccordionDetails>
               </Accordion>
             ))}
             { isAddingLink ? (
-              <>
+              <div className="link_input_container">
                 <input
                   type="text"
                   value={newLinkName}
                   onChange={(e) => setNewLinkName(e.target.value)}
-                  // onKeyDown={handleNewLinkKeyDown}
-                  // onBlur={handleNewLinkBlur}
                   autoFocus
                   className="sidebar_taskInput"
-                  placeholder="Name"
+                  placeholder="Title"
                 />
                 <input
                   type="text"
                   value={newLinkURL}
                   onChange={(e) => setNewLinkURL(e.target.value)}
-                  // onKeyDown={handleNewLinkKeyDown}
-                  // onBlur={handleNewLinkBlur}
                   autoFocus
                   className="sidebar_taskInput"
                   placeholder="URL"
                 />
-                {/* <input
-                  type="text"
-                  value={newLinkAssignee}
-                  onChange={(e) => setNewLinkAssignee(e.target.value)}
-                  // onKeyDown={handleNewLinkKeyDown}
-                  // onBlur={handleNewLinkBlur}
-                  autoFocus
-                  className="sidebar_taskInput"
-                  placeholder="Assignee"
-                /> */}
-                <div>
-                  <p>Assignee</p>
+                <div className="assignee_init_container">
+                  <h4>Assignee:</h4>
                   <Dropdown
                     options={["Director of Operations", "Community", "Treasurer"]}
                     defaultValue="Director of Operations"
                     onChange={(e) => { setNewLinkAssignee(e) }}
                   />
                 </div>
-                <button onClick={addNewLink}>
-                  Submit
-                </button>
-                <button onClick={() => setIsAddingLink(false)}>
-                  Cancel
-                </button>
-              </>
+                <div className="link_button_container">
+                  <Button id="confirmation_button3" variant="outlined" onClick={addNewLink}>Submit</Button>
+                  <Button id="cancellation_button3" variant="outlined" onClick={() => setIsAddingLink(false)}>Cancel</Button>
+                </div>
+                
+              </div>
               
             ) : (
               <IconButton onClick={handleAddLink} id="addButton">

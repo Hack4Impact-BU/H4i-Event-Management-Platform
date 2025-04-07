@@ -301,3 +301,65 @@
     /* margin-top: 0.65rem; */
     font-family: 'Jetbrains Mono', monospace;
 }
+
+#link_title {
+    font-family: 'Jetbrains-Mono', monospace;
+}
+
+#link_container {
+    margin: 1rem;
+}
+
+.link_assignee_container {
+    display: flex;
+    gap: 10px;
+}
+
+#link_details_container {
+    color: black;
+    background-color: #E4E9EE;
+    margin: 5px;
+    margin-top: 0px;
+    border-radius: 5px;
+}
+
+.link_assignee_dropdown {
+    width: 200px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.assignee_init_container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+#confirmation_button3 {
+    width: 6rem;
+    height: 2rem;
+    color: black;
+    border: 3px solid black;
+}
+
+#cancellation_button3 {
+    width: 6rem;
+    height: 2rem;
+    color: red;
+    border: 3px solid red;
+}
+
+.link_button_container {
+    display: flex;
+    justify-content: space-evenly;
+    margin: 15px;
+}
+
+.link_input_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
