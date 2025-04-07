@@ -100,6 +100,19 @@ app.post('/updateEvent', async (req, res) => {
       });
     }
 
+    if (req.body.links) {
+      event.links = [];
+
+      req.body.links.forEach(link => {
+        event.links.push({
+          _id: link._id,
+          name: link.name,
+          url: link.url,
+          assignee: link.assignee,
+        });
+      });
+    }
+
     await event.save();
     res.status(200).send(event);
   } catch (error) {
@@ -202,6 +215,30 @@ app.post('/updateTaskStatus', async (req, res) => {
   }
 });
 
+app.post('/updateAssignee', async (req, res) => {
+  const { linkId, newAssignee } = req.body;
+
+  try {
+    const result = await Event.findOneAndUpdate(
+      { "links._id": linkId },
+      { $set: { "links.$.assignee": newAssignee } },
+      { new: true }
+    );
+
+    if (!result) {
+      console.log("Link not found for ID:", linkId);
+      return res.status(404).json({ message: "Link not found" });
+    }
+
+    const updatedLink = result.links.find(link => link._id.toString() === linkId);
+    console.log("Updated link:", updatedLink);
+
+    res.status(200).json(updatedLink);
+  } catch (error) {
+    console.error("Error updating task status:", error);
+    res.status(500).json({ message: error.message });
+  }
+})
 // Add these new routes after your existing routes
 
 // Get all tags

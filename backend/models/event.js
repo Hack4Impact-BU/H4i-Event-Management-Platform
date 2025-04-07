@@ -51,7 +51,13 @@ const EventSchema = new mongoose.Schema({
     default: [],
   },
   links: {
-    type: [String],
+    type: [
+      {
+        name: { type: String, required: true },
+        url: { type: String, required: true },
+        assignee: { type: String }
+      }
+    ],
     default: [],
   },
   budget: {
