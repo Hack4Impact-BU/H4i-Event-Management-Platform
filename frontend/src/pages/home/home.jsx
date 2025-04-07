@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Home.css';
 import EventCard from '../../components/eventCard/EventCard';
 import NavBar from '../../components/navbar/Navbar';
@@ -13,6 +13,7 @@ const Home = () => {
   const [pastEvents, setPastEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
+  const sidebarRef = useRef(null);
 
   const fetchEvents = async () => {
     try {
@@ -77,6 +78,33 @@ const Home = () => {
 
     return () => clearInterval(updateInterval);
   }, []);
+
+  // Function to handle clicks outside the sidebar
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // If sidebar is open and click is outside sidebar and not on an event card
+      if (
+        selectedEvent &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        !event.target.closest('.home_cardContainer') &&
+        !event.target.closest('#addButton') &&
+        !event.target.closest('#filterButton')
+      ) {
+        setSelectedEvent(null);
+      }
+    };
+
+    // Add event listener when sidebar is open
+    if (selectedEvent) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    // Clean up event listener
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [selectedEvent]);
 
   const closeSidebar = () => setSelectedEvent(null);
 
@@ -249,6 +277,7 @@ const Home = () => {
         selectedEvent={selectedEvent}
         closeSidebar={closeSidebar}
         onUpdateEvent={handleUpdateEvent}
+        ref={sidebarRef}
       />
     </>
   );

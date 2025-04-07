@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, forwardRef } from "react";
 import { IconButton, Button, Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import "./Sidebar.css";
@@ -10,7 +10,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import GoogleCalIcon from "../../assets/google_calendar_icon.svg";
 import "./Sidebar.css";
 
-const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
+const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref) => {
   // Local copy of the event including tasks.
   const [eventData, setEventData] = useState(selectedEvent);
   // State for logistics.
@@ -462,7 +462,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
 
     try {
       const response = await fetch("http://localhost:3000/updateAssignee", {
-        method: "POST", 
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -590,7 +590,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
     setIsDeletingEvent(true);
   }
 
-  const handleDeleteConfirm = async() => {
+  const handleDeleteConfirm = async () => {
     setIsDeletingEvent(false);
     closeSidebar();
     try {
@@ -601,11 +601,11 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
         },
         body: JSON.stringify({ _id: selectedEvent._id })
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch tags');
       }
-      
+
       const data = await response.json();
 
       if (onUpdateEvent) {
@@ -621,7 +621,10 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
   }
 
   return (
-    <div className={`home_sidebarContainer ${selectedEvent ? "open" : ""}`}>
+    <div
+      className={`home_sidebarContainer ${selectedEvent ? "open" : ""}`}
+      ref={ref}
+    >
       <div className="sidebar_header">
         <IconButton id="closeButton" onClick={closeSidebar}>
           <CloseIcon id="closeIcon" />
@@ -795,10 +798,10 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
             {eventData.links && eventData.links.map((link, index) => (
               <Accordion id="link_container" key={index}>
                 <AccordionSummary
-                expandIcon={<ExpandMoreIcon/>}
-                id="link_title"
+                  expandIcon={<ExpandMoreIcon />}
+                  id="link_title"
                 >
-                  <h2>{link.name}</h2>  
+                  <h2>{link.name}</h2>
                 </AccordionSummary>
                 <AccordionDetails id="link_details_container">
                   <div>
@@ -811,7 +814,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
                         <Dropdown
                           options={["Director of Operations", "Community", "Treasurer"]}
                           defaultValue={link.assignee}
-                          onChange={(val) => handleAssigneeChange(link._id, val) }
+                          onChange={(val) => handleAssigneeChange(link._id, val)}
                         />
                       </div>
                     </div>
@@ -819,7 +822,7 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
                 </AccordionDetails>
               </Accordion>
             ))}
-            { isAddingLink ? (
+            {isAddingLink ? (
               <div className="link_input_container">
                 <input
                   type="text"
@@ -849,9 +852,9 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
                   <Button id="confirmation_button3" variant="outlined" onClick={addNewLink}>Submit</Button>
                   <Button id="cancellation_button3" variant="outlined" onClick={() => setIsAddingLink(false)}>Cancel</Button>
                 </div>
-                
+
               </div>
-              
+
             ) : (
               <IconButton onClick={handleAddLink} id="addButton">
                 <AddIcon id="addIcon" />
@@ -876,6 +879,6 @@ const Sidebar = ({ selectedEvent, closeSidebar, onUpdateEvent }) => {
       </div>
     </div>
   );
-};
+});
 
 export default Sidebar;
