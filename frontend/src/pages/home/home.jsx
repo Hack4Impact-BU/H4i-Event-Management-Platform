@@ -93,26 +93,67 @@ const Home = () => {
     applyFilters(upcoming, past, selectedFilters);
   };
 
-  // Apply filters to events
+  // Updated applyFilters function to include task filtering
   const applyFilters = (upcoming = upcomingEvents, past = pastEvents, filters = selectedFilters) => {
-    // Check if any filters are selected (true)
-    const hasActiveFilters = Object.values(filters).some(value => value);
+    // Check if any tag filters are selected
+    const hasTagFilters = filters.tags && Object.values(filters.tags).some(value => value);
 
-    if (!hasActiveFilters) {
-      // If no filters are active, show all events
+    // Check if any task filters are selected
+    const hasTaskFilters = filters.tasks && Object.values(filters.tasks).some(taskStatuses => {
+      return Object.values(taskStatuses).some(value => value);
+    });
+
+    // If no filters are active, show all events
+    if (!hasTagFilters && !hasTaskFilters) {
       setFilteredUpcomingEvents(upcoming);
       setFilteredPastEvents(past);
       return;
     }
 
-    // Filter events based on selected filters
-    const filteredUpcoming = upcoming.filter(event =>
-      filters[event.tag || 'general']
-    );
+    // Filter function that checks both tags and tasks
+    const filterEvent = (event) => {
+      let passesTagFilter = true;
+      let passesTaskFilter = true;
 
-    const filteredPast = past.filter(event =>
-      filters[event.tag || 'general']
-    );
+      // Check tag filter if any are selected
+      if (hasTagFilters) {
+        const eventTag = event.tag || 'general';
+        // Only filter if we have this specific tag in our filters
+        passesTagFilter = filters.tags[eventTag] === true;
+
+        // If the event's tag isn't in our filters at all, don't filter it out
+        if (filters.tags[eventTag] === undefined) {
+          passesTagFilter = true;
+        }
+      }
+
+      // Check task filters if any are selected
+      if (hasTaskFilters) {
+        if (event.tasks && event.tasks.length > 0) {
+          // Event passes if any task matches any selected task-status combination
+          passesTaskFilter = event.tasks.some(task => {
+            // Skip if task has no name or status
+            if (!task.name || !task.status) return false;
+
+            // Look for this task name in our filters
+            const taskFilters = filters.tasks[task.name];
+            if (!taskFilters) return false;
+
+            // Check if this task's status is selected
+            return taskFilters[task.status] === true;
+          });
+        } else {
+          // If event has no tasks and task filters are applied, exclude it
+          passesTaskFilter = false;
+        }
+      }
+
+      return passesTagFilter && passesTaskFilter;
+    };
+
+    // Apply filters to both upcoming and past events
+    const filteredUpcoming = upcoming.filter(filterEvent);
+    const filteredPast = past.filter(filterEvent);
 
     setFilteredUpcomingEvents(filteredUpcoming);
     setFilteredPastEvents(filteredPast);
@@ -120,8 +161,14 @@ const Home = () => {
 
   // Handle applying filters
   const handleApplyFilters = (newFilters) => {
-    setSelectedFilters(newFilters);
-    applyFilters(upcomingEvents, pastEvents, newFilters);
+    // Make sure we always have the correct structure for filters
+    const structuredFilters = {
+      tags: newFilters.tags || {},
+      tasks: newFilters.tasks || {}
+    };
+
+    setSelectedFilters(structuredFilters);
+    applyFilters(upcomingEvents, pastEvents, structuredFilters);
   };
 
   useEffect(() => {
@@ -281,7 +328,14 @@ const Home = () => {
           <IconButton
             id="filterButton"
             onClick={toggleFilter}
-            className={Object.values(selectedFilters).some(v => v) ? "filter-active" : ""}
+            className={
+              (selectedFilters.tags && Object.values(selectedFilters.tags).some(v => v)) ||
+                (selectedFilters.tasks && Object.keys(selectedFilters.tasks).some(taskName =>
+                  Object.values(selectedFilters.tasks[taskName]).some(v => v)
+                ))
+                ? "filter-active"
+                : ""
+            }
           >
             <FilterAltIcon id="filterIcon" />
           </IconButton>

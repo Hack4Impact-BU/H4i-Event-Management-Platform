@@ -12,11 +12,13 @@ css */ .filter-popup-overlay {
 }
 
 .filter-popup-container {
-    width: 300px;
+    width: 250px;
     padding: 1.5rem;
     border-radius: 8px !important;
     display: flex;
     flex-direction: column;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .filter-popup-title {
@@ -28,7 +30,6 @@ css */ .filter-popup-overlay {
 .filter-actions {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 0.5rem;
 }
 
 .filter-action-button {
@@ -52,6 +53,10 @@ css */ .filter-popup-overlay {
     flex-direction: column;
 }
 
+.filter-checkbox {
+    margin-left: 12px !important;
+}
+
 .filter-tag-item {
     display: flex;
     align-items: center;
@@ -68,11 +73,32 @@ css */ .filter-popup-overlay {
     flex-shrink: 0;
 }
 
+.filter-status-item {
+    font-family: 'Jetbrains Mono', monospace;
+    display: flex;
+    align-items: center;
+}
+
+.filter-status-not-started {
+    color: #d32f2f;
+    /* red */
+}
+
+.filter-status-in-progress {
+    color: #1976d2;
+    /* blue */
+}
+
+.filter-status-done {
+    color: #388e3c;
+    /* green */
+}
+
 .filter-popup-buttons {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-    margin-top: 0.5rem;
+    margin-top: 1rem;
 }
 
 .filter-apply-button {
@@ -120,4 +146,118 @@ css */ .filter-popup-overlay {
 
 .filter-options-container::-webkit-scrollbar-thumb:hover {
     background: #aaa;
+}
+
+/* Accordion styles */
+.filter-accordion {
+    box-shadow: none !important;
+    margin-bottom: 0rem !important;
+    background-color: transparent !important;
+}
+
+.filter-accordion:before {
+    display: none !important;
+}
+
+.filter-accordion-summary {
+    padding: 0 !important;
+    min-height: 40px !important;
+}
+
+.filter-section-title {
+    font-family: 'Jetbrains Mono', monospace !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+}
+
+.filter-accordion-details {
+    padding: 0 8px 8px 8px !important;
+}
+
+/* Add these styles to your existing CSS file */
+
+.custom-accordion {
+    margin-bottom: 0.5rem;
+    background-color: transparent;
+}
+
+.custom-accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    cursor: pointer;
+    user-select: none;
+}
+
+.expand-icon {
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.expand-icon.expanded {
+    transform: rotate(180deg);
+}
+
+/* Animation for all accordion contents */
+.custom-accordion-content {
+    padding-bottom: 8px;
+    overflow: hidden;
+    animation: slideDown 0.25s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        max-height: 300px;
+        transform: translateY(0);
+    }
+}
+
+/* Only override scrolling properties for tasks content, not the animation */
+.custom-accordion-content.tasks-content {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* Scrollbar styling remains the same */
+.custom-accordion-content.tasks-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-accordion-content.tasks-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.custom-accordion-content.tasks-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.custom-accordion-content.tasks-content::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
+.task-filter-section {
+    margin-bottom: 0.75rem;
+}
+
+.task-name {
+    font-family: 'Jetbrains Mono', monospace !important;
+    font-weight: 600 !important;
+    margin: 0.5rem 0 0.25rem 0 !important;
+    font-size: 0.9rem !important;
+}
+
+.task-filter-section:last-child .MuiDivider-root {
+    display: none;
 }

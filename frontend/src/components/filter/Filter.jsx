@@ -9,6 +9,7 @@ import {
     Divider,
     Box
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import './Filter.css';
 
 const Filter = ({
@@ -21,6 +22,70 @@ const Filter = ({
 }) => {
     const [filters, setFilters] = useState(selectedFilters || {});
     const [tagColors, setTagColors] = useState({});
+    const [expandedSection, setExpandedSection] = useState(null);
+    const [commonTasks, setCommonTasks] = useState([]);
+
+    // Define task status options
+    const taskStatusOptions = ["Not Started", "In Progress", "Done"];
+
+    // Update the toggleSection function for smoother transitions
+    const toggleSection = (section) => {
+        // If clicking the already expanded section, close it
+        if (expandedSection === section) {
+            setExpandedSection(null);
+        } else {
+            // Otherwise, close current section first (if any)
+            setExpandedSection(null);
+
+            // Use a small timeout to allow the closing animation to finish
+            // before opening the new section
+            setTimeout(() => {
+                setExpandedSection(section);
+            }, 50);
+        }
+    };
+
+    // Fetch common tasks from events
+    useEffect(() => {
+        const fetchCommonTasks = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/events');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch events');
+                }
+                const events = await response.json();
+
+                // Extract all tasks from all events and count occurrences
+                const taskCounts = {};
+                events.forEach(event => {
+                    if (event.tasks && Array.isArray(event.tasks)) {
+                        event.tasks.forEach(task => {
+                            if (task.name) {
+                                taskCounts[task.name] = (taskCounts[task.name] || 0) + 1;
+                            }
+                        });
+                    }
+                });
+
+                // Get tasks that appear in multiple events (common tasks)
+                const commonTaskNames = Object.keys(taskCounts).filter(taskName =>
+                    taskCounts[taskName] > 0
+                );
+
+                setCommonTasks(commonTaskNames);
+            } catch (error) {
+                console.error('Error fetching common tasks:', error);
+                // Default to the three common tasks if fetch fails
+                setCommonTasks([
+                    "Room Confirmation",
+                    "Finance Confirmation",
+                    "Events Confirmation"
+                ]);
+            }
+        };
+
+        fetchCommonTasks();
+    }, []);
 
     useEffect(() => {
         // Fetch tag colors from the server
@@ -50,22 +115,72 @@ const Filter = ({
     useEffect(() => {
         // Initialize filters with current selection
         if (selectedFilters && Object.keys(selectedFilters).length > 0) {
-            setFilters(selectedFilters);
+            // Make sure the filters object has the proper structure
+            const updatedFilters = {
+                tags: selectedFilters.tags || {},
+                tasks: selectedFilters.tasks || {}
+            };
+            setFilters(updatedFilters);
         } else {
-            // Default all tags to NOT selected if no filters are applied yet
-            const initialFilters = {};
+            // Default all tags and task filters to NOT selected
+            const initialFilters = {
+                tags: {},
+                tasks: {}
+            };
+
+            // Initialize tag filters
             availableTags.forEach(tag => {
-                initialFilters[tag] = false;
+                initialFilters.tags[tag] = false;
             });
+
+            // Initialize tasks filters (nested structure)
+            commonTasks.forEach(taskName => {
+                initialFilters.tasks[taskName] = {
+                    "Not Started": false,
+                    "In Progress": false,
+                    "Done": false
+                };
+            });
+
             setFilters(initialFilters);
         }
-    }, [availableTags, selectedFilters, isOpen]);
 
-    const handleFilterChange = (tag) => {
+        // Reset expanded section when filter popup opens/closes
+        setExpandedSection(null);
+    }, [availableTags, selectedFilters, isOpen, commonTasks]);
+
+    const handleTagFilterChange = (tag) => {
         setFilters(prev => ({
             ...prev,
-            [tag]: !prev[tag]
+            tags: {
+                ...prev.tags,
+                [tag]: !prev.tags[tag]
+            }
         }));
+    };
+
+    const handleTaskStatusFilterChange = (taskName, status) => {
+        setFilters(prev => {
+            // Ensure tasks object exists
+            const tasks = prev.tasks || {};
+            // Ensure this task exists in the tasks object
+            const task = tasks[taskName] || {
+                "Not Started": false,
+                "In Progress": false,
+                "Done": false
+            };
+
+            return {
+                ...prev,
+                tasks: {
+                    ...tasks,
+                    [taskName]: {
+                        ...task,
+                        [status]: !task[status]
+                    }
+                }
+            };
+        });
     };
 
     const handleApplyFilters = () => {
@@ -73,20 +188,47 @@ const Filter = ({
         onClose();
     };
 
-    const handleSelectAll = () => {
-        const allSelected = {};
+    const handleClearAllTags = () => {
+        const updatedFilters = { ...filters };
         availableTags.forEach(tag => {
-            allSelected[tag] = true;
+            updatedFilters.tags[tag] = false;
         });
-        setFilters(allSelected);
+        setFilters(updatedFilters);
     };
 
-    const handleClearAll = () => {
-        const allCleared = {};
-        availableTags.forEach(tag => {
-            allCleared[tag] = false;
+    const handleClearAllTaskStatuses = (taskName) => {
+        setFilters(prev => {
+            const updatedTasks = { ...(prev.tasks || {}) };
+
+            updatedTasks[taskName] = {
+                "Not Started": false,
+                "In Progress": false,
+                "Done": false
+            };
+
+            return {
+                ...prev,
+                tasks: updatedTasks
+            };
         });
-        setFilters(allCleared);
+    };
+
+    // Add a new function to handle clearing all task statuses at once
+    const handleClearAllTasks = () => {
+        const updatedFilters = { ...filters };
+
+        // Reset all task statuses to false
+        if (updatedFilters.tasks) {
+            Object.keys(updatedFilters.tasks).forEach(taskName => {
+                updatedFilters.tasks[taskName] = {
+                    "Not Started": false,
+                    "In Progress": false,
+                    "Done": false
+                };
+            });
+        }
+
+        setFilters(updatedFilters);
     };
 
     return (
@@ -96,59 +238,123 @@ const Filter = ({
             onClose={onClose}
             anchorOrigin={{
                 vertical: 'bottom',
-                horizontal: 'center',
+                horizontal: 'right',
             }}
             transformOrigin={{
                 vertical: 'top',
-                horizontal: 'center',
+                horizontal: 'right',
             }}
             PaperProps={{
                 className: "filter-popup-container",
-                style: { backgroundColor: "#E4E9EE" }
+                style: {
+                    backgroundColor: "#E4E9EE",
+                    maxHeight: 'calc(100vh - 64px)', // Subtract navbar height
+                    overflowY: 'auto'
+                }
             }}
         >
             <Typography variant="h6" className="filter-popup-title">
-                Filter by Tags
+                Filters
             </Typography>
 
-            <div className="filter-actions">
-                <Button variant="text" onClick={handleSelectAll} className="filter-action-button">
-                    Select All
-                </Button>
-                <Button variant="text" onClick={handleClearAll} className="filter-action-button">
-                    Clear All
-                </Button>
+            {/* Custom Tags Filter Section */}
+            <div className="custom-accordion">
+                <div
+                    className="custom-accordion-header"
+                    onClick={() => toggleSection('tags')}
+                >
+                    <Typography className="filter-section-title">Tags</Typography>
+                    <div className={`expand-icon ${expandedSection === 'tags' ? 'expanded' : ''}`}>
+                        <ExpandMoreIcon />
+                    </div>
+                </div>
+
+                {expandedSection === 'tags' && (
+                    <div className="custom-accordion-content">
+                        <div className="filter-actions">
+                            <Button variant="text" onClick={handleClearAllTags} className="filter-action-button">
+                                Clear All
+                            </Button>
+                        </div>
+
+                        <Box className="filter-options-container">
+                            <FormGroup className="filter-options">
+                                {availableTags.map((tag) => (
+                                    <FormControlLabel
+                                        key={tag}
+                                        control={
+                                            <Checkbox
+                                                checked={!!filters.tags?.[tag]}
+                                                onChange={() => handleTagFilterChange(tag)}
+                                                className="filter-checkbox"
+                                            />
+                                        }
+                                        label={
+                                            <div className="filter-tag-item">
+                                                <span
+                                                    className="filter-tag-color"
+                                                    style={{ backgroundColor: tagColors[tag] || "#C2E2C7" }}
+                                                />
+                                                {tag}
+                                            </div>
+                                        }
+                                    />
+                                ))}
+                            </FormGroup>
+                        </Box>
+                    </div>
+                )}
             </div>
 
-            <Divider sx={{ my: 1 }} />
+            {/* Task Filters Section */}
+            <div className="custom-accordion">
+                <div
+                    className="custom-accordion-header"
+                    onClick={() => toggleSection('tasks')}
+                >
+                    <Typography className="filter-section-title">Tasks</Typography>
+                    <div className={`expand-icon ${expandedSection === 'tasks' ? 'expanded' : ''}`}>
+                        <ExpandMoreIcon />
+                    </div>
+                </div>
 
-            <Box className="filter-options-container">
-                <FormGroup className="filter-options">
-                    {availableTags.map((tag) => (
-                        <FormControlLabel
-                            key={tag}
-                            control={
-                                <Checkbox
-                                    checked={!!filters[tag]}
-                                    onChange={() => handleFilterChange(tag)}
-                                    className="filter-checkbox"
-                                />
-                            }
-                            label={
-                                <div className="filter-tag-item">
-                                    <span
-                                        className="filter-tag-color"
-                                        style={{ backgroundColor: tagColors[tag] || "#C2E2C7" }}
-                                    />
-                                    {tag}
-                                </div>
-                            }
-                        />
-                    ))}
-                </FormGroup>
-            </Box>
+                {expandedSection === 'tasks' && (
+                    <div className="custom-accordion-content tasks-content">
+                        <div className="filter-actions">
+                            <Button variant="text" onClick={handleClearAllTasks} className="filter-action-button">
+                                Clear All
+                            </Button>
+                        </div>
 
-            <Divider sx={{ my: 1 }} />
+                        {commonTasks.map(taskName => (
+                            <div key={taskName} className="task-filter-section">
+                                <Typography className="task-name">{taskName}</Typography>
+
+                                <FormGroup className="filter-options">
+                                    {taskStatusOptions.map(status => (
+                                        <FormControlLabel
+                                            key={`${taskName}-${status}`}
+                                            control={
+                                                <Checkbox
+                                                    checked={!!filters.tasks?.[taskName]?.[status]}
+                                                    onChange={() => handleTaskStatusFilterChange(taskName, status)}
+                                                    className="filter-checkbox"
+                                                />
+                                            }
+                                            label={
+                                                <div className={`filter-status-item filter-status-${status.toLowerCase().replace(/\s+/g, '-')}`}>
+                                                    {status}
+                                                </div>
+                                            }
+                                        />
+                                    ))}
+                                </FormGroup>
+                                <Divider sx={{ my: 1 }} />
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
 
             <div className="filter-popup-buttons">
                 <Button variant="outlined" onClick={onClose} className="filter-cancel-button">
