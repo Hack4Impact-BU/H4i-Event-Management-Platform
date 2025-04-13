@@ -1,0 +1,263 @@
+css */ .filter-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1100;
+}
+
+.filter-popup-container {
+    width: 250px;
+    padding: 1.5rem;
+    border-radius: 8px !important;
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.filter-popup-title {
+    font-family: 'Jetbrains Mono', monospace !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.filter-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+.filter-action-button {
+    font-family: 'Jetbrains Mono', monospace !important;
+    font-size: 0.85rem !important;
+    color: #005695 !important;
+    padding: 0.25rem 0.5rem !important;
+    min-width: auto !important;
+}
+
+.filter-options-container {
+    width: 100%;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.filter-options {
+    padding-right: 0.5rem;
+    margin: 0.5rem 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-checkbox {
+    margin-left: 12px !important;
+}
+
+.filter-tag-item {
+    display: flex;
+    align-items: center;
+    font-family: 'Jetbrains Mono', monospace;
+    white-space: nowrap;
+}
+
+.filter-tag-color {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.filter-status-item {
+    font-family: 'Jetbrains Mono', monospace;
+    display: flex;
+    align-items: center;
+}
+
+.filter-status-not-started {
+    color: #d32f2f;
+    /* red */
+}
+
+.filter-status-in-progress {
+    color: #1976d2;
+    /* blue */
+}
+
+.filter-status-done {
+    color: #388e3c;
+    /* green */
+}
+
+.filter-popup-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.filter-apply-button {
+    background-color: #005695 !important;
+    color: white !important;
+    font-family: 'Jetbrains Mono', monospace !important;
+}
+
+.filter-cancel-button {
+    color: #666 !important;
+    border-color: #666 !important;
+    font-family: 'Jetbrains Mono', monospace !important;
+}
+
+/* Add styles for filter icon active state */
+.filter-active {
+    position: relative;
+}
+
+.filter-active::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    background-color: #005695;
+    border-radius: 50%;
+}
+
+/* Fix scrollbar styling for better UX */
+.filter-options-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.filter-options-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.filter-options-container::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.filter-options-container::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
+/* Accordion styles */
+.filter-accordion {
+    box-shadow: none !important;
+    margin-bottom: 0rem !important;
+    background-color: transparent !important;
+}
+
+.filter-accordion:before {
+    display: none !important;
+}
+
+.filter-accordion-summary {
+    padding: 0 !important;
+    min-height: 40px !important;
+}
+
+.filter-section-title {
+    font-family: 'Jetbrains Mono', monospace !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+}
+
+.filter-accordion-details {
+    padding: 0 8px 8px 8px !important;
+}
+
+/* Add these styles to your existing CSS file */
+
+.custom-accordion {
+    margin-bottom: 0.5rem;
+    background-color: transparent;
+}
+
+.custom-accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    cursor: pointer;
+    user-select: none;
+}
+
+.expand-icon {
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.expand-icon.expanded {
+    transform: rotate(180deg);
+}
+
+/* Animation for all accordion contents */
+.custom-accordion-content {
+    padding-bottom: 8px;
+    overflow: hidden;
+    animation: slideDown 0.25s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        max-height: 300px;
+        transform: translateY(0);
+    }
+}
+
+/* Only override scrolling properties for tasks content, not the animation */
+.custom-accordion-content.tasks-content {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* Scrollbar styling remains the same */
+.custom-accordion-content.tasks-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-accordion-content.tasks-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.custom-accordion-content.tasks-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.custom-accordion-content.tasks-content::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
+.task-filter-section {
+    margin-bottom: 0.75rem;
+}
+
+.task-name {
+    font-family: 'Jetbrains Mono', monospace !important;
+    font-weight: 600 !important;
+    margin: 0.5rem 0 0.25rem 0 !important;
+    font-size: 0.9rem !important;
+}
+
+.task-filter-section:last-child .MuiDivider-root {
+    display: none;
+}
