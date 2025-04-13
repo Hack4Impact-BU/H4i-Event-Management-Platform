@@ -44,15 +44,13 @@
     color: #000;
 }
 
-#budget_icon {
-    margin: 10px;
+#setting_button {
     font-size: 2rem;
     color: #000;
 }
 
-#setting_button {
-    font-size: 2rem;
-    color: #000;
+#settings_icon {
+    margin: 13.5px;
 }
 
 #events {
@@ -65,17 +63,17 @@
     font-family: 'Jetbrains Mono'
 }
 
-#budget_simulation {
-    color: #000;
-    font-family: 'Jetbrains Mono'
-}
-
 #events_box {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: row;
     color: #231F20;
+    transition: all 0.2s ease-in-out;
+}
+
+#events_box:hover #events {
+    text-decoration: underline;
 }
 
 #finances_box {
@@ -84,12 +82,9 @@
     align-items: center;
     flex-direction: row;
     color: #000;
+    transition: all 0.2s ease-in-out;
 }
 
-#budget_simulation_box {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: row;
-    color: #000;
+#finances_box:hover #finances {
+    text-decoration: underline;
 }
