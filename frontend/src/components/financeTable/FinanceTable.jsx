@@ -1,24 +1,109 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper } from '@mui/material';
+import Dropdown from "../dropdown/Dropdown";
 import "./FinanceTable.css";
 
-function createData(name, calories, fat, carbs, protein) {
-    return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
-
 const FinanceTable = () => {
+    const [rows, setRows] = useState([]);
+    const [tags, setTags] = useState([]);
+    const [tagColors, setTagColors] = useState({});
+
+    useEffect(() => {
+        fetchEvents().then(data => sortEvents(data));
+        fetchTags();
+    }, []);
+    
+    const fetchEvents = async () => {
+        try {
+            const response = await fetch('http://localhost:3000/events');
+            if (!response.ok) {
+            throw new Error('Failed to fetch events');
+            }
+            const data = await response.json();
+    
+            return data;
+        } catch (error) {
+            console.error('Error fetching events:', error);
+        }
+    };
+
+    const fetchTags = async () => {
+        try {
+            const response = await fetch('http://localhost:3000/tags');
+            if (!response.ok) {
+            throw new Error('Failed to fetch tags');
+            }
+            const data = await response.json();
+
+            const tags = [];
+            const tagColors = {};
+
+            data.forEach(tag => {
+                tags.push(tag.name);
+                tagColors[tag.name] = tag.color;
+            });
+
+            setTags(tags);
+            setTagColors(tagColors);
+        } catch (error) {
+            console.error('Error fetching tags:', error);
+        }
+    };
+
+    const handleTagChange = async (event, value) => {
+        try {
+            const response = await fetch('http://localhost:3000/updateEvent', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    _id: event._id,
+                    title: event.title,
+                    location: event.location,
+                    description: event.description,
+                    tag: value,
+                    tagColor: tagColors[value] || "#C2E2C7",
+                    date: event.date,
+                    budget: {
+                        predicted: event.budget.predicted,
+                        actual: event.budget.actual,
+                    },
+                    attendance: event.attendance,
+                    time: {
+                        start: event.time.start,
+                        end: event.time.end,
+                    },
+                    tasks: event.tasks,
+                    link: event.links,
+                })
+            });
+    
+            console.log(response);
+
+            if (!response.ok) {
+                console.error("Failed to update tag");
+            };
+
+
+        } catch (error) {
+            console.error("Error updating tag", error);
+        }
+        
+    }
+
+    const sortEvents = (data) => {
+        const temp = data;
+
+        temp.sort((a, b) => new Date(b.date) - new Date(a.date))
+
+        setRows(temp);
+    }
+
     
     return (
         <div className="finance_table_container">
-            <Table aria-label="finance table">
+            <Table id="finance_table">
                 <TableHead>
                     <TableRow>
                         <TableCell>Event Name</TableCell>
@@ -31,16 +116,36 @@ const FinanceTable = () => {
                 <TableBody>
                 {rows.map((row) => (
                     <TableRow
-                    key={row.name}
+                    key={row._id}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                     >
-                    <TableCell component="th" scope="row">
-                        {row.name}
+                    <TableCell>{row.title}</TableCell>
+                    <TableCell align="center">
+                        <Dropdown
+                            options={tags}
+                            defaultValue={row.tag}
+                            onChange={(value) => handleTagChange(row, value)}
+                            renderOption={(option) => (
+                                <>
+                                    <span
+                                        className="tag-color-indicator"
+                                        style={{
+                                        display: "inline-block",
+                                        width: "12px",
+                                        height: "12px",
+                                        borderRadius: "50%",
+                                        backgroundColor: tagColors[option] || "#C2E2C7",
+                                        marginRight: "8px",
+                                        }}
+                                    />
+                                    {option}
+                                </>
+                            )}
+                        />
                     </TableCell>
-                    <TableCell align="center">{row.calories}</TableCell>
-                    <TableCell align="center">{row.fat}</TableCell>
-                    <TableCell align="center">${row.carbs}</TableCell>
-                    <TableCell align="center">{row.protein}</TableCell>
+                    <TableCell align="center">{new Date(row.date).toLocaleDateString()}</TableCell>
+                    <TableCell align="center">${row.budget.actual}</TableCell>
+                    <TableCell align="center">{row.attendance}</TableCell>
                     </TableRow>
                 ))}
                 </TableBody>
