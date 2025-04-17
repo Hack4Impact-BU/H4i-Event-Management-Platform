@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const EventSchema = new mongoose.Schema({
 	semester: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "Semester",
+		required: true,
+	},
+	semesterName: {
 		type: String,
 		required: true,
 	},

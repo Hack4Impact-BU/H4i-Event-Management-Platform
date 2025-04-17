@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const Event = require('./models/event');
 const Tag = require('./models/tag');
+const Semester = require('./models/semester');
 const fs = require('fs').promises;
 const path = require('path');
 const process = require('process');
@@ -24,20 +25,59 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Update the createEvent endpoint
+
 app.post('/createEvent', async (req, res) => {
   console.log(req.body);
   try {
-    const event = new Event(req.body);
+    const semesterName = req.body.semesterName || req.body.semester; // Support both fields for backward compatibility
+
+    // Check if semester exists
+    let semester = await Semester.findOne({ name: semesterName });
+
+    // If semester doesn't exist, create it
+    if (!semester) {
+      semester = new Semester({
+        name: semesterName,
+        budget: "0",
+        expenses: "0",
+        events: []
+      });
+      await semester.save();
+      console.log(`Created new semester: ${semesterName}`);
+    }
+
+    // Create the event with a reference to the semester
+    const eventData = {
+      ...req.body,
+      semester: semester._id,
+      semesterName: semesterName
+    };
+
+    const event = new Event(eventData);
     await event.save();
+
+    // Add the event to the semester's events array
+    semester.events.push(event._id);
+
+    // Update the semester's expenses with the new event's actual budget
+    const actualBudget = event.budget.actual || 0;
+    const currentExpenses = parseFloat(semester.expenses) || 0;
+    semester.expenses = (currentExpenses + actualBudget).toFixed(2);
+
+    await semester.save();
+
     res.status(201).send(event);
   } catch (error) {
+    console.error('Error creating event:', error);
     res.status(400).send(error);
   }
 });
 
+// Add this as a separate endpoint (it was mistakenly inside the createEvent endpoint)
 app.get('/events', async (req, res) => {
   try {
-    const events = await Event.find();
+    const events = await Event.find().populate('semester');
     res.status(200).json(events);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -49,6 +89,51 @@ app.post('/updateEvent', async (req, res) => {
     const event = await Event.findById(req.body._id);
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
+    }
+
+    // Store old actual budget for comparison
+    const oldActualBudget = event.budget.actual;
+
+    // Check if semester has changed
+    const newSemesterName = req.body.semesterName || req.body.semester;
+    if (newSemesterName && event.semesterName !== newSemesterName) {
+      // Find or create the new semester
+      let newSemester = await Semester.findOne({ name: newSemesterName });
+      if (!newSemester) {
+        newSemester = new Semester({
+          name: newSemesterName,
+          budget: "0",
+          expenses: "0",
+          events: []
+        });
+        await newSemester.save();
+      }
+
+      // Remove event from old semester and update old semester's expenses
+      if (event.semester) {
+        // Get the old semester to update its expenses
+        const oldSemester = await Semester.findById(event.semester);
+        if (oldSemester) {
+          // Remove the event's actual budget from the old semester's expenses
+          const oldSemesterExpenses = parseFloat(oldSemester.expenses) - oldActualBudget;
+          oldSemester.expenses = Math.max(0, oldSemesterExpenses).toFixed(2);
+          await oldSemester.save();
+        }
+
+        // Remove event from old semester's events array
+        await Semester.findByIdAndUpdate(
+          event.semester,
+          { $pull: { events: event._id } }
+        );
+      }
+
+      // Add event to new semester
+      newSemester.events.push(event._id);
+      await newSemester.save();
+
+      // Update event with new semester reference
+      event.semester = newSemester._id;
+      event.semesterName = newSemesterName;
     }
 
     // Update basic fields
@@ -71,7 +156,9 @@ app.post('/updateEvent', async (req, res) => {
 
     // Update other fields...
     event.budget.predicted = req.body.budget.predicted || 0;
-    event.budget.actual = req.body.budget.actual || 0;
+    // Store new actual budget
+    const newActualBudget = req.body.budget.actual || 0;
+    event.budget.actual = newActualBudget;
     event.attendance = req.body.attendance || 0;
 
     // Update date if provided
@@ -114,6 +201,22 @@ app.post('/updateEvent', async (req, res) => {
     }
 
     await event.save();
+
+    // Update the semester's expenses if the actual budget has changed
+    if (oldActualBudget !== newActualBudget) {
+      const semester = await Semester.findById(event.semester);
+      if (semester) {
+        // Calculate the difference between old and new actual budget
+        const budgetDifference = newActualBudget - oldActualBudget;
+
+        // Update the semester's expenses
+        const currentExpenses = parseFloat(semester.expenses) || 0;
+        const newExpenses = Math.max(0, currentExpenses + budgetDifference);
+        semester.expenses = newExpenses.toFixed(2);
+        await semester.save();
+      }
+    }
+
     res.status(200).send(event);
   } catch (error) {
     console.error("Error updating event:", error);
@@ -238,7 +341,8 @@ app.post('/updateAssignee', async (req, res) => {
     console.error("Error updating task status:", error);
     res.status(500).json({ message: error.message });
   }
-})
+});
+
 // Add these new routes after your existing routes
 
 // Get all tags
@@ -340,12 +444,40 @@ app.post('/tags', async (req, res) => {
   }
 });
 
+// Update the deleteEvent endpoint
+
 app.post('/deleteEvent', async (req, res) => {
   try {
-    const response = await Event.deleteOne({ _id: req.body._id });
-    if (!response) {
+    const event = await Event.findById(req.body._id);
+    if (!event) {
       return res.status(404).json({ message: "Event not found" });
     }
+
+    // Remove event from semester's events array and update expenses
+    if (event.semester) {
+      const semester = await Semester.findById(event.semester);
+      if (semester) {
+        // Subtract the event's actual budget from the semester's expenses
+        const actualBudget = event.budget.actual || 0;
+        const currentExpenses = parseFloat(semester.expenses) || 0;
+        const newExpenses = Math.max(0, currentExpenses - actualBudget);
+        semester.expenses = newExpenses.toFixed(2);
+
+        // Remove the event from semester's events array
+        semester.events.pull(event._id);
+
+        await semester.save();
+      } else {
+        // If semester not found but ID exists, just remove the reference
+        await Semester.findByIdAndUpdate(
+          event.semester,
+          { $pull: { events: event._id } }
+        );
+      }
+    }
+
+    // Delete the event
+    const response = await Event.deleteOne({ _id: req.body._id });
 
     res.status(200).send(response);
   } catch (error) {
@@ -367,6 +499,56 @@ app.post('/deleteLink', async (req, res) => {
 
     res.status(200).send(response);
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Add a new endpoint to get semesters with their events
+app.get('/semesters', async (req, res) => {
+  try {
+    const semesters = await Semester.find().populate('events');
+    res.status(200).json(semesters);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Add a new endpoint to get a specific semester with its events
+app.get('/semesters/:id', async (req, res) => {
+  try {
+    const semester = await Semester.findById(req.params.id).populate('events');
+    if (!semester) {
+      return res.status(404).json({ message: 'Semester not found' });
+    }
+    res.status(200).json(semester);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Add this endpoint to your existing backend
+
+app.post('/updateSemesterBudget', async (req, res) => {
+  try {
+    const { semesterId, budget } = req.body;
+
+    if (!semesterId) {
+      return res.status(400).json({ message: "Semester ID is required" });
+    }
+
+    const semester = await Semester.findById(semesterId);
+    if (!semester) {
+      return res.status(404).json({ message: "Semester not found" });
+    }
+
+    // Update the budget
+    semester.budget = budget;
+    await semester.save();
+
+    // Return the updated semester
+    res.status(200).json(semester);
+  } catch (error) {
+    console.error("Error updating semester budget:", error);
     res.status(500).json({ message: error.message });
   }
 });

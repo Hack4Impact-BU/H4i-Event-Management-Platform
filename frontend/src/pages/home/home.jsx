@@ -272,19 +272,19 @@ const Home = () => {
 			const currentMonth = todayDate.getMonth() + 1; // JavaScript months are 0-indexed
 			const currentYear = todayDate.getFullYear();
 
-			let semester;
+			let semesterName;
 			if (currentMonth >= 1 && currentMonth <= 5) {
-				semester = `Spring ${currentYear}`;
+				semesterName = `Spring ${currentYear}`;
 			} else if (currentMonth >= 9 && currentMonth <= 12) {
-				semester = `Fall ${currentYear}`;
+				semesterName = `Fall ${currentYear}`;
 			} else {
 				// For months outside the specified semesters (Jun-Aug)
 				// Assign to upcoming semester (Fall)
-				semester = `Fall ${currentYear}`;
+				semesterName = `Fall ${currentYear}`;
 			}
 
 			const event = {
-				semester: semester,
+				semesterName: semesterName,
 				title: "New Event",
 				location: "",
 				description: "",
@@ -355,9 +355,8 @@ const Home = () => {
 			<NavBar />
 
 			<div
-				className={`home_container ${
-					selectedEvent ? "sidebar-open" : ""
-				}`}
+				className={`home_container ${selectedEvent ? "sidebar-open" : ""
+					}`}
 			>
 				<div className="home_buttonContainer">
 					<IconButton
@@ -368,13 +367,13 @@ const Home = () => {
 								Object.values(selectedFilters.tags).some(
 									(v) => v
 								)) ||
-							(selectedFilters.tasks &&
-								Object.keys(selectedFilters.tasks).some(
-									(taskName) =>
-										Object.values(
-											selectedFilters.tasks[taskName]
-										).some((v) => v)
-								))
+								(selectedFilters.tasks &&
+									Object.keys(selectedFilters.tasks).some(
+										(taskName) =>
+											Object.values(
+												selectedFilters.tasks[taskName]
+											).some((v) => v)
+									))
 								? "filter-active"
 								: ""
 						}
@@ -387,9 +386,8 @@ const Home = () => {
 				</div>
 
 				<div
-					className={`home_eventsContent ${
-						selectedEvent ? "sidebar-open" : ""
-					}`}
+					className={`home_eventsContent ${selectedEvent ? "sidebar-open" : ""
+						}`}
 				>
 					<Box className="tabs-container">
 						<Tabs
@@ -413,12 +411,11 @@ const Home = () => {
 							{filteredUpcomingEvents.length > 0 ? (
 								filteredUpcomingEvents.map((event) => (
 									<div
-										className={`home_cardContainer ${
-											selectedEvent &&
-											selectedEvent._id === event._id
+										className={`home_cardContainer ${selectedEvent &&
+												selectedEvent._id === event._id
 												? "selected-event"
 												: ""
-										}`}
+											}`}
 										key={event._id}
 										onClick={() => setSelectedEvent(event)}
 										onMouseEnter={(e) => {
@@ -452,12 +449,11 @@ const Home = () => {
 							{filteredPastEvents.length > 0 ? (
 								filteredPastEvents.map((event) => (
 									<div
-										className={`home_cardContainer ${
-											selectedEvent &&
-											selectedEvent._id === event._id
+										className={`home_cardContainer ${selectedEvent &&
+												selectedEvent._id === event._id
 												? "selected-event"
 												: ""
-										}`}
+											}`}
 										key={event._id}
 										onClick={() => setSelectedEvent(event)}
 										onMouseEnter={(e) => {
