@@ -93,9 +93,11 @@ const FinanceTable = () => {
     }
 
     const sortEvents = (data) => {
-        const temp = data;
+        let temp = data;
+        const today = new Date();
 
         temp.sort((a, b) => new Date(b.date) - new Date(a.date))
+        temp = temp.filter((event) => new Date(event.date) <= today);
 
         setRows(temp);
     }
@@ -143,7 +145,7 @@ const FinanceTable = () => {
                             )}
                         />
                     </TableCell>
-                    <TableCell align="center">{new Date(row.date).toLocaleDateString()}</TableCell>
+                    <TableCell align="center">{new Date(`${row.date}T00:00:00`).toLocaleDateString('en-US', { timeZone: 'America/New_York' })}</TableCell>
                     <TableCell align="center">${row.budget.actual}</TableCell>
                     <TableCell align="center">{row.attendance}</TableCell>
                     </TableRow>
