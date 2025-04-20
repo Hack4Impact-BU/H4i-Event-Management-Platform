@@ -4,9 +4,9 @@ import "./PieChart.css";
 
 
 const Piechart = (budget) => {
-    if (budget <= 0) {
-        budget = 360;
-    }
+    // if (budget <= 0) {
+    //     budget = 360;
+    // }
 
     return (
         <PieChart
@@ -24,8 +24,7 @@ const Piechart = (budget) => {
                     innerRadius: "75px",
                     arcLabel: (params) => params.label ?? '',
                     startAngle: 0,
-
-                    endAngle: budget,
+                    endAngle: 365,
                 },
             ]}
         />
