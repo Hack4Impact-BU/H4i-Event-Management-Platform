@@ -257,7 +257,7 @@ export default function Finances() {
                 </div>
             </div>
 			<div className="finance_information_container">
-				<Piechart budget={360} />
+				<Piechart budget={budgetInput} />
 				<FinanceTable />
 			</div>
         </>

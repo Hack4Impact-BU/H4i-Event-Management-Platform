@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper } from '@mui/material';
+import { Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
 import Dropdown from "../dropdown/Dropdown";
 import "./FinanceTable.css";
 
