@@ -3,7 +3,11 @@ import { PieChart } from '@mui/x-charts/PieChart';
 import "./PieChart.css";
 
 
-const Piechart = () => {
+const Piechart = (budget) => {
+    if (budget <= 0) {
+        budget = 360;
+    }
+
     return (
         <PieChart
             id="pie_chart"
@@ -19,7 +23,9 @@ const Piechart = () => {
                     ],
                     innerRadius: "75px",
                     arcLabel: (params) => params.label ?? '',
-                    arcLabelMinAngle: 20,
+                    startAngle: 0,
+
+                    endAngle: budget,
                 },
             ]}
         />
