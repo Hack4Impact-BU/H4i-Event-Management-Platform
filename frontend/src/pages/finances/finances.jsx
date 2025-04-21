@@ -256,10 +256,10 @@ export default function Finances() {
                     <p>Current Expenses: <span>${currentSemester.expenses || "0"}</span></p>
                 </div>
             </div>
-			<div className="finance_information_container">
-				<Piechart budget={budgetInput} />
-				<FinanceTable />
-			</div>
+            <div className="finance_information_container">
+                <Piechart budget={budgetInput || 0} />
+                <FinanceTable />
+            </div>
         </>
     );
 }

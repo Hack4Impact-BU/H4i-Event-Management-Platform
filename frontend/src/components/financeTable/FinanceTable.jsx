@@ -78,8 +78,6 @@ const FinanceTable = () => {
                     link: event.links,
                 })
             });
-    
-            console.log(response);
 
             if (!response.ok) {
                 console.error("Failed to update tag");

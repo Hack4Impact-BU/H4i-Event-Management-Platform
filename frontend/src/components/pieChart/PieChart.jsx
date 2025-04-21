@@ -9,12 +9,10 @@ const Piechart = (budget) => {
     const [tagColors, setTagColors] = useState({});
     const [data, setData] = useState([]);
     const [total, setTotal] = useState(0);
-    // let budget = 1000;
 
     useEffect(() => {
-        fetchEvents().then(data => sortEvents(data)).then(populateChart());
+        fetchEvents().then(data => sortEvents(data)).then(events => populateChart(events));
         fetchTags();
-        // populateChart();
     }, []);
 
     const fetchEvents = async () => {
@@ -62,10 +60,10 @@ const Piechart = (budget) => {
         temp = temp.filter((event) => new Date(event.date) <= today);
 
         setEvents(temp);
+        return temp;
     }
 
-    const populateChart = () => {
-        console.log("populating chart");
+    const populateChart = (events) => {
         const values = {
             "general": 0,
             "speaker event": 0,
