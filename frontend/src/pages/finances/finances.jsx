@@ -236,22 +236,24 @@ export default function Finances() {
                 </div>
 
                 <div className="semester-finances">
-                    <label className="semester-budget-label">
-                        Semester Budget:
-                    </label>
-                    <input
-                        className="semester-budget-input"
-                        value={budgetInput}
-                        onChange={handleBudgetChange}
-                        onBlur={handleBudgetBlur}
-                        onKeyPress={handleKeyPress}
-                        disabled={isBudgetUpdating || loading}
-                        type="text"
-                    />
-                    {isBudgetUpdating && <CircularProgress size={16} className="budget-updating-indicator" />}
-
-                    <p>Current Balance: <span>${calculateBalance(currentSemester.budget || "0", currentSemester.expenses || "0")}</span></p>
-                    <p>Current Expenses: <span>${currentSemester.expenses || "0"}</span></p>
+                    <div>
+                        <label className="semester-budget-label">
+                            Budget:
+                        </label>
+                        <input
+                            className="semester-budget-input"
+                            value={budgetInput}
+                            onChange={handleBudgetChange}
+                            onBlur={handleBudgetBlur}
+                            onKeyPress={handleKeyPress}
+                            disabled={isBudgetUpdating || loading}
+                            type="text"
+                        />
+                    </div>
+                    <p>Balance: <span style={{ color: calculateBalance(currentSemester.budget || "0", currentSemester.expenses || "0") >= 0 ? 'green' : 'red' }}>
+                        ${calculateBalance(currentSemester.budget || "0", currentSemester.expenses || "0")}
+                    </span></p>
+                    <p>Expenses: <span>${currentSemester.expenses || "0"}</span></p>
                 </div>
 
 

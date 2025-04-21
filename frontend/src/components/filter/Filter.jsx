@@ -24,24 +24,38 @@ const Filter = ({
     const [tagColors, setTagColors] = useState({});
     const [expandedSection, setExpandedSection] = useState(null);
     const [commonTasks, setCommonTasks] = useState([]);
+    const [closingSection, setClosingSection] = useState(null);
 
     // Define task status options
     const taskStatusOptions = ["Not Started", "In Progress", "Done"];
 
-    // Update the toggleSection function for smoother transitions
+    // Update the toggle function to ensure the animation fully plays
     const toggleSection = (section) => {
         // If clicking the already expanded section, close it
         if (expandedSection === section) {
+            // First, mark this section as closing
+            setClosingSection(section);
+            // Clear the expandedSection immediately so CSS classes apply correctly
             setExpandedSection(null);
-        } else {
-            // Otherwise, close current section first (if any)
-            setExpandedSection(null);
-
-            // Use a small timeout to allow the closing animation to finish
-            // before opening the new section
+            // Then remove the element after animation completes
             setTimeout(() => {
+                setClosingSection(null);
+            }, 250); // Match animation duration
+        } else {
+            // If there's already an expanded section, close it first
+            if (expandedSection) {
+                setClosingSection(expandedSection);
+                setExpandedSection(null); // Immediately clear expanded to start closing animation
+
+                // After the closing animation finishes, set the new expanded section
+                setTimeout(() => {
+                    setExpandedSection(section);
+                    setClosingSection(null);
+                }, 250);
+            } else {
+                // If nothing is expanded, just expand the clicked section
                 setExpandedSection(section);
-            }, 50);
+            }
         }
     };
 
@@ -269,8 +283,8 @@ const Filter = ({
                     </div>
                 </div>
 
-                {expandedSection === 'tags' && (
-                    <div className="custom-accordion-content">
+                {(expandedSection === 'tags' || closingSection === 'tags') && (
+                    <div className={`custom-accordion-content ${expandedSection === 'tags' ? 'opening' : 'closing'}`}>
                         <div className="filter-actions">
                             <Button variant="text" onClick={handleClearAllTags} className="filter-action-button">
                                 Clear All
@@ -318,8 +332,8 @@ const Filter = ({
                     </div>
                 </div>
 
-                {expandedSection === 'tasks' && (
-                    <div className="custom-accordion-content tasks-content">
+                {(expandedSection === 'tasks' || closingSection === 'tasks') && (
+                    <div className={`custom-accordion-content tasks-content ${expandedSection === 'tasks' ? 'opening' : 'closing'}`}>
                         <div className="filter-actions">
                             <Button variant="text" onClick={handleClearAllTasks} className="filter-action-button">
                                 Clear All

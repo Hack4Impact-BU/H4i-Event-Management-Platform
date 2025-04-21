@@ -114,6 +114,23 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
   // Function to update the event on the backend.
   const updateEvent = async () => {
     try {
+      // Calculate semester name based on the selected date
+      const eventDate = new Date(date);
+      const currentMonth = eventDate.getMonth() + 1; // JavaScript months are 0-indexed
+      const currentYear = eventDate.getFullYear();
+
+      // Determine semester based on date
+      let semesterName;
+      if (currentMonth >= 1 && currentMonth <= 5) {
+        semesterName = `Spring ${currentYear}`;
+      } else if (currentMonth >= 9 && currentMonth <= 12) {
+        semesterName = `Fall ${currentYear}`;
+      } else {
+        // For months outside the specified semesters (Jun-Aug)
+        // Assign to upcoming semester (Fall)
+        semesterName = `Fall ${currentYear}`;
+      }
+
       const response = await fetch("http://localhost:3000/updateEvent", {
         method: "POST",
         headers: {
@@ -137,6 +154,7 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
             start: startTime,
             end: endTime,
           },
+          semesterName: semesterName, // Include the new semester name
         }),
       });
       if (!response.ok) {
