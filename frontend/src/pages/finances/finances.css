@@ -8,7 +8,6 @@
 .finance-budget-container {
     margin-top: 120px;
     padding: 0 2rem;
-    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -107,5 +106,22 @@
 
 .semester-finances {
     display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4rem;
+}
 
+.semester-budget-input {
+    border: none;
+    background-color: #e0e0e0;
+    font-size: 1.25rem;
+    font-family: 'Jetbrains Mono', monospace;
+    padding: 0.5rem 0.75rem;
+    margin: 0.5rem;
+    border-radius: 0.625rem;
+    width: 5rem;
+}
+
+.semester-finances span {
+    font-size: 1.25rem;
 }

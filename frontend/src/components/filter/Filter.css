@@ -200,13 +200,14 @@ css */ .filter-popup-overlay {
     transform: rotate(180deg);
 }
 
-/* Animation for all accordion contents */
 .custom-accordion-content {
     padding-bottom: 8px;
     overflow: hidden;
-    animation: slideDown 0.25s ease-out;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
+/* Make sure the animations are defined correctly */
 @keyframes slideDown {
     from {
         opacity: 0;
@@ -216,34 +217,58 @@ css */ .filter-popup-overlay {
 
     to {
         opacity: 1;
-        max-height: 300px;
+        max-height: 200px;
         transform: translateY(0);
     }
 }
 
+@keyframes slideUp {
+    from {
+        opacity: 1;
+        max-height: 200px;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* Update the animation properties to ensure they work properly */
+.custom-accordion-content.opening {
+    animation: slideDown 0.25s ease-out forwards;
+}
+
+.custom-accordion-content.closing {
+    animation: slideUp 0.25s ease-out forwards;
+}
+
 /* Only override scrolling properties for tasks content, not the animation */
 .custom-accordion-content.tasks-content {
-    max-height: 300px;
+    max-height: 200px;
+    /* Reduced from 300px */
     overflow-y: auto;
     padding-right: 4px;
 }
 
 /* Scrollbar styling remains the same */
-.custom-accordion-content.tasks-content::-webkit-scrollbar {
+.custom-accordion-content::-webkit-scrollbar {
     width: 6px;
 }
 
-.custom-accordion-content.tasks-content::-webkit-scrollbar-track {
+.custom-accordion-content::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 3px;
 }
 
-.custom-accordion-content.tasks-content::-webkit-scrollbar-thumb {
+.custom-accordion-content::-webkit-scrollbar-thumb {
     background: #ccc;
     border-radius: 3px;
 }
 
-.custom-accordion-content.tasks-content::-webkit-scrollbar-thumb:hover {
+.custom-accordion-content::-webkit-scrollbar-thumb:hover {
     background: #aaa;
 }
 
