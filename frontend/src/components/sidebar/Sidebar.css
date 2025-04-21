@@ -263,11 +263,11 @@
     margin-top: 1rem;
     background-color: white;
     border-radius: 0.625rem;
-    width: 35rem;
+    width: 135%;
 }
 
 #delete_event_button {
-    width: 20rem;
+    width: 100%;
     height: 2.5rem;
     border: 2px solid red;
     color: red;
@@ -276,9 +276,10 @@
 }
 
 .button_field {
-    margin-bottom: 1rem;
+    margin-bottom: 15px;
     padding: none;
-    width: 35rem;
+    width: 100%;
+    height: 50px;
     /* border-style: solid; */
     display: flex;
     justify-content: space-evenly;
@@ -288,8 +289,8 @@
     color: white;
     border: 2px solid white;
     background-color: red;
-    width: 12rem;
-    height: 3rem;
+    width: 40%;
+    height: 100%;
     /* margin-top: 0.65rem; */
     font-family: 'Jetbrains Mono', monospace;
 }
@@ -297,8 +298,8 @@
 #cancellation_button2 {
     color: #000;
     border-color: #000;
-    width: 12rem;
-    height: 3rem;
+    width: 40%;
+    height: 100%;
     /* margin-top: 0.65rem; */
     font-family: 'Jetbrains Mono', monospace;
 }

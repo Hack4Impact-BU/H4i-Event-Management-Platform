@@ -1,0 +1,11 @@
+.finance_table_container {
+    margin: 15px;
+    width: 70%;
+    box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.25);
+    background-color: #E4E9EE;
+    border-radius: 1.25rem;
+}
+
+#finance_table {
+    font-family: 'Jetbrains Mono', monospace;
+}

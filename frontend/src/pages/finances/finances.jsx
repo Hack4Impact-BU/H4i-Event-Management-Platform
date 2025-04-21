@@ -13,6 +13,8 @@ import {
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import NavBar from "../../components/navbar/Navbar";
+import FinanceTable from "../../components/financeTable/financeTable";
+import Piechart from "../../components/pieChart/PieChart";
 import "./finances.css";
 
 export default function Finances() {
@@ -208,7 +210,7 @@ export default function Finances() {
     return (
         <>
             <NavBar />
-            <div className="finances-container">
+            <div className="finance-budget-container">
                 <div className="semester-navigation">
                     <IconButton
                         onClick={handlePrevSemester}
@@ -255,8 +257,10 @@ export default function Finances() {
                     </span></p>
                     <p>Expenses: <span>${currentSemester.expenses || "0"}</span></p>
                 </div>
-
-
+            </div>
+            <div className="finance_information_container">
+                <Piechart budget={budgetInput || 0} />
+                <FinanceTable />
             </div>
         </>
     );

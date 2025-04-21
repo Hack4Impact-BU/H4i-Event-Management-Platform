@@ -47,10 +47,10 @@ body {
 .home_buttonContainer {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: right;
     gap: 1rem;
-    width: 6rem;
-    padding-top: 6rem;
+    width: 10rem;
+    padding-top: 7rem;
 }
 
 .home_emptyDiv {

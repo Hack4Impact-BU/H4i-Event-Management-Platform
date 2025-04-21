@@ -1,4 +1,11 @@
-.finances-container {
+.finance_information_container {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.finance-budget-container {
     margin-top: 120px;
     padding: 0 2rem;
     margin-left: auto;

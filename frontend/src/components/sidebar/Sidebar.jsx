@@ -185,11 +185,11 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
           'location': selectedEvent.location,
           'description': selectedEvent.description,
           'start': {
-            'dateTime': `${selectedEvent.date}T${selectedEvent.time.start}:00-05:00`,
+            'dateTime': `${selectedEvent.date}T${selectedEvent.time.start}:00-04:00`,
             'timeZone': 'America/New_York'
           },
           'end': {
-            'dateTime': `${selectedEvent.date}T${selectedEvent.time.end}:00-05:00`,
+            'dateTime': `${selectedEvent.date}T${selectedEvent.time.end}:00-04:00`,
             'timeZone': 'America/New_York'
           },
         })
