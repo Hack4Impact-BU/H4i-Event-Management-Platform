@@ -13,7 +13,7 @@ import {
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import NavBar from "../../components/navbar/Navbar";
-import FinanceTable from "../../components/financeTable/financeTable";
+import FinanceTable from "../../components/financeTable/FinanceTable";
 import Piechart from "../../components/pieChart/PieChart";
 import "./finances.css";
 
@@ -260,7 +260,10 @@ export default function Finances() {
             </div>
             <div className="finance_information_container">
                 <Piechart budget={budgetInput || 0} />
-                <FinanceTable />
+                <FinanceTable 
+                key={currentSemesterIndex}
+                semester={semesters[currentSemesterIndex]}
+                />
             </div>
         </>
     );

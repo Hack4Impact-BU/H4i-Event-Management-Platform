@@ -3,7 +3,7 @@ import { Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material'
 import Dropdown from "../dropdown/Dropdown";
 import "./FinanceTable.css";
 
-const FinanceTable = () => {
+const FinanceTable = (semester) => {
     const [rows, setRows] = useState([]);
     const [tags, setTags] = useState([]);
     const [tagColors, setTagColors] = useState({});
@@ -93,9 +93,12 @@ const FinanceTable = () => {
     const sortEvents = (data) => {
         let temp = data;
         const today = new Date();
+        console.log('Sorting events');
 
         temp.sort((a, b) => new Date(b.date) - new Date(a.date))
         temp = temp.filter((event) => new Date(event.date) <= today);
+
+        temp = temp.filter((event) =>  event.semesterName === semester.semester.name);
 
         setRows(temp);
     }
