@@ -104,8 +104,7 @@ const Piechart = (semester) => {
                     innerRadius: "75px",
                     arcLabel: (params) => params.label ?? '',
                     startAngle: 0,
-                    endAngle: (360 * Math.round(total / semester.budget)),
-                    // endAngle: 360,
+                    endAngle: 360,
                 },
             ]}
         />
