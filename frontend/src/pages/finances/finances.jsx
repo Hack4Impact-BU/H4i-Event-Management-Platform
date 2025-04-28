@@ -47,7 +47,6 @@ export default function Finances() {
             }
 
             const data = await response.json();
-            console.log("Fetched semesters:", data); // Debug log
 
             // If no semesters, create default current semester
             if (data.length === 0) {
@@ -96,7 +95,7 @@ export default function Finances() {
                 setBudgetInput(data[indexToUse].budget || "0");
             }
 
-            console.log("Current semester index:", indexToUse);
+            // console.log("Current semester index:", indexToUse);
             setLoading(false);
         } catch (error) {
             console.error("Error fetching semesters:", error);
@@ -259,11 +258,23 @@ export default function Finances() {
                 </div>
             </div>
             <div className="finance_information_container">
-                <Piechart budget={budgetInput || 0} />
-                <FinanceTable 
-                key={currentSemesterIndex}
-                semester={semesters[currentSemesterIndex]}
-                />
+                {semesters[currentSemesterIndex] && 
+                (
+                    <>
+                        <Piechart 
+                            semester={semesters[currentSemesterIndex]}
+                            budget={budgetInput || 0} 
+                        />
+                        <FinanceTable
+                            key={currentSemesterIndex}
+                            semester={semesters[currentSemesterIndex]}
+                        />
+                    </>
+                )
+
+                }
+                
+                
             </div>
         </>
     );

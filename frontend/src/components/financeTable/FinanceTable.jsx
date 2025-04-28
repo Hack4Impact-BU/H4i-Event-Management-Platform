@@ -93,12 +93,11 @@ const FinanceTable = (semester) => {
     const sortEvents = (data) => {
         let temp = data;
         const today = new Date();
-        console.log('Sorting events');
 
         temp.sort((a, b) => new Date(b.date) - new Date(a.date))
         temp = temp.filter((event) => new Date(event.date) <= today);
-
-        temp = temp.filter((event) =>  event.semesterName === semester.semester.name);
+        
+        temp = temp.filter((event) =>  event.semesterName === semester.semester?.name);
 
         setRows(temp);
     }
