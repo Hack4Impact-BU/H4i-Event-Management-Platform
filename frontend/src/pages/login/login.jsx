@@ -11,16 +11,59 @@ const Login = ({ setIsAuthenticated }) => {
     const navigate = useNavigate();
 
     const oauth = useGoogleLogin({
-        onSuccess: tokenResponse => {
+        onSuccess: async tokenResponse => {
             console.log(tokenResponse);
             const token = tokenResponse.access_token || tokenResponse.credential;
             sessionStorage.setItem('authToken', token);
-            setIsAuthenticated(true);
-            navigate('/home');
+
+            try {
+                // Fetch user profile data from Google
+                const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (!userInfoResponse.ok) {
+                    throw new Error('Failed to fetch user profile');
+                }
+
+                const userInfo = await userInfoResponse.json();
+
+                // Register/update user in our backend
+                const response = await fetch('http://localhost:3000/users/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: userInfo.email,
+                        name: userInfo.name
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to register user');
+                }
+
+                const userData = await response.json();
+
+                // Store user data in session storage
+                sessionStorage.setItem('userEmail', userData.email);
+                sessionStorage.setItem('userName', userData.name);
+                sessionStorage.setItem('userColor', userData.color);
+
+                // Continue with authentication flow
+                setIsAuthenticated(true);
+                navigate('/home');
+            } catch (error) {
+                console.error('Login processing error:', error);
+            }
         },
         onError: error => {
             console.error('Login Failed', error);
         },
+        scope: 'email profile' // Request email and profile scopes
     });
 
     return (

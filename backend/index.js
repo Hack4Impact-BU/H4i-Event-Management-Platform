@@ -4,12 +4,15 @@ const express = require('express');
 const Event = require('./models/event');
 const Tag = require('./models/tag');
 const Semester = require('./models/semester');
+const User = require('./models/user');
 const fs = require('fs').promises;
 const path = require('path');
 const process = require('process');
 const { authenticate } = require('@google-cloud/local-auth');
 const { google } = require('googleapis');
 const cors = require('cors');
+const cron = require('node-cron');
+const { cleanupInactiveUsers } = require('./utils/cleanupUsers');
 
 const MONGO_URI = process.env.MONGO_URI;
 
@@ -550,6 +553,90 @@ app.post('/updateSemesterBudget', async (req, res) => {
   } catch (error) {
     console.error("Error updating semester budget:", error);
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Add this endpoint after your existing routes
+app.post('/users/login', async (req, res) => {
+  try {
+    const { email, name } = req.body;
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+
+    if (user) {
+      // Update existing user's last login time and name
+      user.lastLoggedIn = new Date();
+      user.name = name; // Update in case name changed
+      await user.save();
+    } else {
+      // Create new user with unique color
+      const color = await generateUniqueUserColor();
+      user = new User({
+        email,
+        name,
+        color,
+        lastLoggedIn: new Date()
+      });
+      await user.save();
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error processing user login:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Function to generate unique user colors (similar to tag colors)
+async function generateUniqueUserColor() {
+  try {
+    const existingUsers = await User.find();
+    const existingColors = existingUsers.map(user => user.color);
+
+    // Find available colors from our predefined list
+    const availableColors = distinctPastelColors.filter(
+      color => !existingColors.includes(color)
+    );
+
+    if (availableColors.length > 0) {
+      // Use an available color
+      return availableColors[Math.floor(Math.random() * availableColors.length)];
+    } else {
+      // Generate a random HSL color if all predefined colors are used
+      const h = Math.floor(Math.random() * 360);
+      const s = Math.floor(Math.random() * 30) + 25; // 25-54% saturation
+      const l = Math.floor(Math.random() * 15) + 80; // 80-94% lightness
+
+      return `hsl(${h}, ${s}%, ${l}%)`;
+    }
+  } catch (error) {
+    console.error("Error generating user color:", error);
+    // Fallback to a random color
+    const randomIndex = Math.floor(Math.random() * distinctPastelColors.length);
+    return distinctPastelColors[randomIndex];
+  }
+}
+
+// Add this endpoint to get all users
+app.get('/users', async (req, res) => {
+  try {
+    const users = await User.find().sort('name');
+    res.status(200).json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Schedule task to run at midnight every day
+cron.schedule('0 0 * * *', async () => {
+  console.log('Running scheduled cleanup of inactive users...');
+  try {
+    const removedCount = await cleanupInactiveUsers();
+    console.log(`Successfully removed ${removedCount} inactive users`);
+  } catch (error) {
+    console.error('Scheduled cleanup failed:', error);
   }
 });
 
