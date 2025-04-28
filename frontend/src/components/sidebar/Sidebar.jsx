@@ -37,7 +37,8 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
   const [isAddingLink, setIsAddingLink] = useState(false);
   const [newLinkName, setNewLinkName] = useState("");
   const [newLinkURL, setNewLinkURL] = useState("");
-  const [newLinkAssignee, setNewLinkAssignee] = useState("Director of Operations");
+  const [newLinkAssignee, setNewLinkAssignee] = useState("");
+  const [users, setUsers] = useState([]);
 
   // Ref to track if update is from user or server
   const isUserAction = useRef(false);
@@ -64,6 +65,31 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
       setIsAddingLink(false);
     }
   }, [selectedEvent]);
+
+  // Add this useEffect to fetch users
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/users');
+        if (!response.ok) {
+          throw new Error('Failed to fetch users');
+        }
+        const userData = await response.json();
+        setUsers(userData);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  // Add this useEffect to set default assignee when users are loaded
+  useEffect(() => {
+    if (users.length > 0 && !newLinkAssignee) {
+      setNewLinkAssignee(users[0]?.name);
+    }
+  }, [users]);
 
   // Update net when budget values change.
   useEffect(() => {
@@ -852,9 +878,27 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
                       <p>Assignee:</p>
                       <div className="link_assignee_dropdown">
                         <Dropdown
-                          options={["Director of Operations", "Community", "Treasurer"]}
+                          options={users.length > 0 ? users.map(user => user.name) : ["Loading users..."]}
                           defaultValue={link.assignee}
                           onChange={(val) => handleAssigneeChange(link._id, val)}
+                          renderOption={(option) => (
+                            <>
+                              {users.find(user => user.name === option) && (
+                                <span
+                                  className="user-color-indicator"
+                                  style={{
+                                    display: "inline-block",
+                                    width: "12px",
+                                    height: "12px",
+                                    borderRadius: "50%",
+                                    backgroundColor: users.find(user => user.name === option)?.color || "#C2E2C7",
+                                    marginRight: "8px",
+                                  }}
+                                />
+                              )}
+                              {option}
+                            </>
+                          )}
                         />
                       </div>
                     </div>
@@ -886,9 +930,27 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
                 <div className="assignee_init_container">
                   <h4>Assignee:</h4>
                   <Dropdown
-                    options={["Director of Operations", "Community", "Treasurer"]}
-                    defaultValue="Director of Operations"
+                    options={users.length > 0 ? users.map(user => user.name) : ["Loading users..."]}
+                    defaultValue={users.length > 0 ? users[0]?.name : "Loading..."}
                     onChange={(e) => { setNewLinkAssignee(e) }}
+                    renderOption={(option) => (
+                      <>
+                        {users.find(user => user.name === option) && (
+                          <span
+                            className="user-color-indicator"
+                            style={{
+                              display: "inline-block",
+                              width: "12px",
+                              height: "12px",
+                              borderRadius: "50%",
+                              backgroundColor: users.find(user => user.name === option)?.color || "#C2E2C7",
+                              marginRight: "8px",
+                            }}
+                          />
+                        )}
+                        {option}
+                      </>
+                    )}
                   />
                 </div>
                 <div className="link_button_container">
