@@ -13,7 +13,7 @@ import {
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import NavBar from "../../components/navbar/Navbar";
-import FinanceTable from "../../components/financeTable/financeTable";
+import FinanceTable from "../../components/financeTable/FinanceTable";
 import Piechart from "../../components/pieChart/PieChart";
 import "./finances.css";
 
@@ -23,6 +23,7 @@ export default function Finances() {
     const [loading, setLoading] = useState(true);
     const [budgetInput, setBudgetInput] = useState("0");
     const [isBudgetUpdating, setIsBudgetUpdating] = useState(false);
+    const [tableChange, setTableChange] = useState(0);
 
     // Function to get current semester name
     const getCurrentSemesterName = () => {
@@ -47,7 +48,6 @@ export default function Finances() {
             }
 
             const data = await response.json();
-            console.log("Fetched semesters:", data); // Debug log
 
             // If no semesters, create default current semester
             if (data.length === 0) {
@@ -96,7 +96,7 @@ export default function Finances() {
                 setBudgetInput(data[indexToUse].budget || "0");
             }
 
-            console.log("Current semester index:", indexToUse);
+            // console.log("Current semester index:", indexToUse);
             setLoading(false);
         } catch (error) {
             console.error("Error fetching semesters:", error);
@@ -259,8 +259,26 @@ export default function Finances() {
                 </div>
             </div>
             <div className="finance_information_container">
-                <Piechart budget={budgetInput || 0} />
-                <FinanceTable />
+                {semesters[currentSemesterIndex] &&
+                (
+                    <>
+                        <Piechart 
+                            semester={semesters[currentSemesterIndex]}
+                            budget={currentSemester || 0}
+                            key={currentSemesterIndex + 1}
+                            onTableChange={tableChange}
+                        />
+                        <FinanceTable
+                            key={currentSemesterIndex}
+                            semester={semesters[currentSemesterIndex]}
+                            onTableChange={() => setTableChange(prev => prev + 1)}
+                        />
+                    </>
+                )
+
+                }
+                
+                
             </div>
         </>
     );

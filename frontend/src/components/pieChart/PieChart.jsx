@@ -3,17 +3,18 @@ import { PieChart } from '@mui/x-charts/PieChart';
 import "./PieChart.css";
 
 
-const Piechart = (budget) => {
+const Piechart = (semester) => {
     const [events,setEvents] = useState([]);
     const [tags, setTags] = useState([]);
     const [tagColors, setTagColors] = useState({});
     const [data, setData] = useState([]);
     const [total, setTotal] = useState(0);
 
+
     useEffect(() => {
         fetchEvents().then(data => sortEvents(data)).then(events => populateChart(events));
         fetchTags();
-    }, []);
+    }, [semester.onTableChange]);
 
     const fetchEvents = async () => {
         try {
@@ -59,6 +60,8 @@ const Piechart = (budget) => {
         temp.sort((a, b) => new Date(b.date) - new Date(a.date))
         temp = temp.filter((event) => new Date(event.date) <= today);
 
+        temp = temp.filter((event) =>  event.semesterName === semester.semester?.name);
+
         setEvents(temp);
         return temp;
     }
@@ -101,7 +104,7 @@ const Piechart = (budget) => {
                     innerRadius: "75px",
                     arcLabel: (params) => params.label ?? '',
                     startAngle: 0,
-                    endAngle: 360 * (total / budget.budget),
+                    endAngle: 360,
                 },
             ]}
         />
