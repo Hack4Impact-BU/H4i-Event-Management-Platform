@@ -81,7 +81,9 @@ const FinanceTable = (semester) => {
 
             if (!response.ok) {
                 console.error("Failed to update tag");
-            };
+            } else {
+                semester.onTableChange();
+            }
 
 
         } catch (error) {
@@ -96,7 +98,7 @@ const FinanceTable = (semester) => {
 
         temp.sort((a, b) => new Date(b.date) - new Date(a.date))
         temp = temp.filter((event) => new Date(event.date) <= today);
-        
+
         temp = temp.filter((event) =>  event.semesterName === semester.semester?.name);
 
         setRows(temp);

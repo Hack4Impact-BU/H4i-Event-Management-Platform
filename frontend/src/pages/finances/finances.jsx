@@ -23,6 +23,7 @@ export default function Finances() {
     const [loading, setLoading] = useState(true);
     const [budgetInput, setBudgetInput] = useState("0");
     const [isBudgetUpdating, setIsBudgetUpdating] = useState(false);
+    const [tableChange, setTableChange] = useState(0);
 
     // Function to get current semester name
     const getCurrentSemesterName = () => {
@@ -258,16 +259,19 @@ export default function Finances() {
                 </div>
             </div>
             <div className="finance_information_container">
-                {semesters[currentSemesterIndex] && 
+                {semesters[currentSemesterIndex] &&
                 (
                     <>
                         <Piechart 
                             semester={semesters[currentSemesterIndex]}
-                            budget={budgetInput || 0} 
+                            budget={currentSemester || 0}
+                            key={currentSemesterIndex + 1}
+                            onTableChange={tableChange}
                         />
                         <FinanceTable
                             key={currentSemesterIndex}
                             semester={semesters[currentSemesterIndex]}
+                            onTableChange={() => setTableChange(prev => prev + 1)}
                         />
                     </>
                 )
