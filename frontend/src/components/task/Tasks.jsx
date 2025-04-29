@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Tasks.css";
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
-import Dropdown from "../dropdown/Dropdown";
+import Dropdown from "../dropdown/Dropdown.jsx";
 
 const Task = ({ task, onStatusChange, onDelete }) => {
   const [status, setStatus] = useState(task.status || "Not Started");

@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./home.css";
-import EventCard from "../../components/eventCard/EventCard";
+import EventCard from "../../components/eventCard/EventCard.jsx";
 import NavBar from "../../components/navbar/Navbar";
 import { IconButton, Typography, Tabs, Tab, Box } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import Sidebar from "../../components/sidebar/Sidebar";
-import Filter from "../../components/filter/Filter";
+import Sidebar from "../../components/sidebar/Sidebar.jsx";
+import Filter from "../../components/filter/Filter.jsx";
 
 const Home = () => {
 	const [events, setEvents] = useState([]);
