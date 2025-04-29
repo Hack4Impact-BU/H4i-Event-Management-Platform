@@ -12,9 +12,9 @@ import {
 } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import NavBar from "../../components/navbar/Navbar";
-import FinanceTable from "../../components/financeTable/FinanceTable";
-import Piechart from "../../components/pieChart/PieChart";
+import NavBar from "../../components/navbar/Navbar.jsx";
+import FinanceTable from "../../components/financeTable/FinanceTable.jsx";
+import Piechart from "../../components/pieChart/PieChart.jsx";
 import "./finances.css";
 
 export default function Finances() {
