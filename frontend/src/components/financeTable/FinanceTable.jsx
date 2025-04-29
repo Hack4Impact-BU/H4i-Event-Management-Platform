@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
-import Dropdown from "../dropdown/Dropdown";
+import Dropdown from "../dropdown/Dropdown.jsx";
 import "./FinanceTable.css";
 
 const FinanceTable = (semester) => {
