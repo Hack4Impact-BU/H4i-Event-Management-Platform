@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./Home.css";
+import "./home.css";
 import EventCard from "../../components/eventCard/EventCard";
 import NavBar from "../../components/navbar/Navbar";
 import { IconButton, Typography, Tabs, Tab, Box } from "@mui/material";
