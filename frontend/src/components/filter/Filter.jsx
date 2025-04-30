@@ -63,7 +63,7 @@ const Filter = ({
     useEffect(() => {
         const fetchCommonTasks = async () => {
             try {
-                const response = await fetch('http://localhost:3000/events');
+                const response = await fetch('https://h4i-event-management-platform-production.up.railway.app/events');
                 if (!response.ok) {
                     throw new Error('Failed to fetch events');
                 }
@@ -105,7 +105,7 @@ const Filter = ({
         // Fetch tag colors from the server
         const fetchTagColors = async () => {
             try {
-                const response = await fetch('http://localhost:3000/tags');
+                const response = await fetch('https://h4i-event-management-platform-production.up.railway.app/tags');
                 if (!response.ok) {
                     throw new Error('Failed to fetch tags');
                 }

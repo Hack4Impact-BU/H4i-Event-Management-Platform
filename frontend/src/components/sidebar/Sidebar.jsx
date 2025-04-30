@@ -70,7 +70,7 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch('http://localhost:3000/users');
+        const response = await fetch('https://h4i-event-management-platform-production.up.railway.app/users');
         if (!response.ok) {
           throw new Error('Failed to fetch users');
         }
@@ -157,7 +157,7 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
         semesterName = `Fall ${currentYear}`;
       }
 
-      const response = await fetch("http://localhost:3000/updateEvent", {
+      const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/updateEvent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -201,7 +201,7 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
   const sendInvite = async () => {
     try {
       setCalendarEventAdded(true);
-      const response = await fetch("http://localhost:3000/sendInvite", {
+      const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/sendInvite", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -247,7 +247,7 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
 
     // Make direct API call to update task status
     try {
-      const response = await fetch("http://localhost:3000/updateTaskStatus", {
+      const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/updateTaskStatus", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -294,7 +294,7 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
 
     // Directly send API request without triggering useEffect
     try {
-      const response = await fetch("http://localhost:3000/updateEvent", {
+      const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/updateEvent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -389,7 +389,7 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
 
     // Send update to server
     try {
-      const response = await fetch("http://localhost:3000/updateEvent", {
+      const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/updateEvent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -446,7 +446,7 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
     const updatedLinks = [...eventData.links, newLink];
 
     try {
-      const response = await fetch("http://localhost:3000/updateEvent", {
+      const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/updateEvent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -499,7 +499,7 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
     setEventData(updatedEventData);
 
     try {
-      const response = await fetch("http://localhost:3000/updateAssignee", {
+      const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/updateAssignee", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -522,7 +522,7 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
   const deleteLink = async (linkId) => {
     try {
       const eventId = selectedEvent._id;
-      const response = await fetch("http://localhost:3000/deleteLink", {
+      const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/deleteLink", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -570,7 +570,7 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
 
     try {
       // Add new tag to the backend
-      const response = await fetch('http://localhost:3000/tags', {
+      const response = await fetch('https://h4i-event-management-platform-production.up.railway.app/tags', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -611,7 +611,7 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await fetch('http://localhost:3000/tags');
+        const response = await fetch('https://h4i-event-management-platform-production.up.railway.app/tags');
         if (!response.ok) {
           throw new Error('Failed to fetch tags');
         }
@@ -660,7 +660,7 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
     setIsDeletingEvent(false);
     closeSidebar();
     try {
-      const response = await fetch('http://localhost:3000/deleteEvent', {
+      const response = await fetch('https://h4i-event-management-platform-production.up.railway.app/deleteEvent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
