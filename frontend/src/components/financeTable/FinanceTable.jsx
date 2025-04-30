@@ -15,7 +15,7 @@ const FinanceTable = (semester) => {
     
     const fetchEvents = async () => {
         try {
-            const response = await fetch('http://localhost:3000/events');
+            const response = await fetch('https://h4i-event-management-platform-production.up.railway.app/events');
             if (!response.ok) {
             throw new Error('Failed to fetch events');
             }
@@ -29,7 +29,7 @@ const FinanceTable = (semester) => {
 
     const fetchTags = async () => {
         try {
-            const response = await fetch('http://localhost:3000/tags');
+            const response = await fetch('https://h4i-event-management-platform-production.up.railway.app/tags');
             if (!response.ok) {
             throw new Error('Failed to fetch tags');
             }
@@ -52,7 +52,7 @@ const FinanceTable = (semester) => {
 
     const handleTagChange = async (event, value) => {
         try {
-            const response = await fetch('http://localhost:3000/updateEvent', {
+            const response = await fetch('https://h4i-event-management-platform-production.up.railway.app/updateEvent', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

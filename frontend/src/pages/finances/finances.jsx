@@ -42,7 +42,7 @@ export default function Finances() {
     const fetchSemesters = async () => {
         try {
             setLoading(true);
-            const response = await fetch("http://localhost:3000/semesters");
+            const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/semesters");
             if (!response.ok) {
                 throw new Error("Failed to fetch semesters");
             }
@@ -162,7 +162,7 @@ export default function Finances() {
         try {
             setIsBudgetUpdating(true);
 
-            const response = await fetch("http://localhost:3000/updateSemesterBudget", {
+            const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/updateSemesterBudget", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

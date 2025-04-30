@@ -18,7 +18,7 @@ const Piechart = (semester) => {
 
     const fetchEvents = async () => {
         try {
-            const response = await fetch('http://localhost:3000/events');
+            const response = await fetch('https://h4i-event-management-platform-production.up.railway.app/events');
             if (!response.ok) {
             throw new Error('Failed to fetch events');
             }
@@ -32,7 +32,7 @@ const Piechart = (semester) => {
 
     const fetchTags = async () => {
         try {
-            const response = await fetch('http://localhost:3000/tags');
+            const response = await fetch('https://h4i-event-management-platform-production.up.railway.app/tags');
             if (!response.ok) {
             throw new Error('Failed to fetch tags');
             }
