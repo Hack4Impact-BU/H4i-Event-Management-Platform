@@ -5,7 +5,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import AttachMoneyOutlinedIcon from "@mui/icons-material/AttachMoneyOutlined";
 import EventNoteOutlinedIcon from "@mui/icons-material/EventNoteOutlined";
 import H4iLogo from "../../assets/h4i_removed_bg.png";
-import "./Navbar.css";
+import "./navbar.css";
 
 const NavBar = () => {
 	return (
