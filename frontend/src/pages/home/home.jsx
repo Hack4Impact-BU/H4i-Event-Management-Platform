@@ -28,7 +28,7 @@ const Home = () => {
 
 	const fetchEvents = async () => {
 		try {
-			const response = await fetch("http://localhost:3000/events");
+			const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/events");
 			if (!response.ok) {
 				throw new Error("Failed to fetch events");
 			}
@@ -188,7 +188,7 @@ const Home = () => {
 		// Fetch all available tags from the server
 		const fetchTags = async () => {
 			try {
-				const response = await fetch("http://localhost:3000/tags");
+				const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/tags");
 				if (!response.ok) {
 					throw new Error("Failed to fetch tags");
 				}
@@ -315,7 +315,7 @@ const Home = () => {
 				},
 			};
 
-			const response = await fetch("http://localhost:3000/createEvent", {
+			const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/createEvent", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
