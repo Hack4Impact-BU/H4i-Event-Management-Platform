@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import NavBar from "../../components/navbar/Navbar.jsx";
+import NavBar from "../../components/navbar/navbar.jsx";
 import FinanceTable from "../../components/financeTable/FinanceTable.jsx";
 import Piechart from "../../components/pieChart/PieChart.jsx";
 import "./finances.css";
