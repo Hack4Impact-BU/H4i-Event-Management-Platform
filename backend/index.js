@@ -97,6 +97,9 @@ app.post('/updateEvent', async (req, res) => {
     // Store old actual budget for comparison
     const oldActualBudget = event.budget.actual;
 
+    // Store new actual budget - MOVED THIS UP
+    const newActualBudget = req.body.budget.actual || 0;
+
     // Check if semester has changed
     const newSemesterName = req.body.semesterName || req.body.semester;
     if (newSemesterName && event.semesterName !== newSemesterName) {
@@ -132,6 +135,11 @@ app.post('/updateEvent', async (req, res) => {
 
       // Add event to new semester
       newSemester.events.push(event._id);
+
+      // Add the event's actual budget to the new semester's expenses
+      const newSemesterExpenses = parseFloat(newSemester.expenses) || 0;
+      newSemester.expenses = (newSemesterExpenses + newActualBudget).toFixed(2);
+
       await newSemester.save();
 
       // Update event with new semester reference
@@ -159,9 +167,7 @@ app.post('/updateEvent', async (req, res) => {
 
     // Update other fields...
     event.budget.predicted = req.body.budget.predicted || 0;
-    // Store new actual budget
-    const newActualBudget = req.body.budget.actual || 0;
-    event.budget.actual = newActualBudget;
+    event.budget.actual = newActualBudget; // Just use the already defined variable
     event.attendance = req.body.attendance || 0;
 
     // Update date if provided
