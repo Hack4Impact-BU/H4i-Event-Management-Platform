@@ -1,5 +1,5 @@
 [build]
-  publish = "frontend/dist"    # adjust to your publish folder
+  publish = "dist"    # adjust to your publish folder
 
 [[redirects]]
   from = "/*"
