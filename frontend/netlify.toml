@@ -1,0 +1,7 @@
+[build]
+  publish = "frontend/dist"    # adjust to your publish folder
+
+[[redirects]]
+  from = "/*"
+  to   = "/index.html"
+  status = 200
