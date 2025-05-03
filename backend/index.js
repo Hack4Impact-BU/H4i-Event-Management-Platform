@@ -235,7 +235,6 @@ app.post('/updateEvent', async (req, res) => {
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 const TOKEN_PATH = path.join(process.cwd(), 'token.json');
-const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
 
 async function loadSavedCredentialsIfExist() {
   try {
@@ -248,8 +247,7 @@ async function loadSavedCredentialsIfExist() {
 }
 
 async function saveCredentials(client) {
-  const content = await fs.readFile(CREDENTIALS_PATH);
-  const keys = JSON.parse(content);
+  const keys = process.env.GOOGLE_CREDENTIALS_JSON;
   const key = keys.installed || keys.web;
   const payload = JSON.stringify({
     type: 'authorized_user',
@@ -267,7 +265,7 @@ async function authorize(event) {
   }
   client = await authenticate({
     scopes: SCOPES,
-    keyfilePath: CREDENTIALS_PATH,
+    credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON),
   });
   if (client.credentials) {
     await saveCredentials(client);
