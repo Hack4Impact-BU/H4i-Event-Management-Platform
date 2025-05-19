@@ -235,67 +235,72 @@ app.post('/updateEvent', async (req, res) => {
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 const TOKEN_PATH = path.join(process.cwd(), 'token.json');
-const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
 
-async function loadSavedCredentialsIfExist() {
+const oauth2Client = new google.auth.OAuth2(
+  process.env.GOOGLE_OAUTH_CLIENT_ID,
+  process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+  process.env.GOOGLE_OAUTH_REDIRECT_URI
+);
+
+app.get('/auth', (req, res) => {
+  const url = oauth2Client.generateAuthUrl({
+    access_type: 'offline',     // so you get a refresh_token
+    scope: SCOPES,
+    prompt: 'consent'           // force refresh_token each time
+  });
+  res.redirect(url);
+});
+
+app.get('/oauth2callback', async (req, res) => {
+  try {
+    const { code } = req.query;
+    const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
+    await fs.writeFile(TOKEN_PATH, JSON.stringify(tokens));
+    res.send('Google Calendar authorized. You can now close this window.');
+  } catch (err) {
+    console.error('OAuth callback error', err);
+    res.status(500).send('Authentication failed');
+  }
+});
+
+async function loadSavedTokens() {
   try {
     const content = await fs.readFile(TOKEN_PATH);
-    const credentials = JSON.parse(content);
-    return google.auth.fromJSON(credentials);
-  } catch (error) {
+    const tokens = JSON.parse(content);
+    oauth2Client.setCredentials(tokens);
+    return oauth2Client;
+  } catch {
     return null;
   }
 }
 
-async function saveCredentials(client) {
-  const content = await fs.readFile(CREDENTIALS_PATH);
-  const keys = JSON.parse(content);
-  const key = keys.installed || keys.web;
-  const payload = JSON.stringify({
-    type: 'authorized_user',
-    client_id: key.client_id,
-    client_secret: key.client_secret,
-    refresh_token: client.credentials.refresh_token,
-  });
-  await fs.writeFile(TOKEN_PATH, payload);
+function insertEvent(resource, auth) {
+  return google.calendar({ version: 'v3', auth })
+    .events.insert({ calendarId: 'primary', resource });
 }
 
-async function authorize(event) {
-  let client = await loadSavedCredentialsIfExist();
-  if (client) {
-    return client;
+async function ensureAuth(req, res, next) {
+  const client = await loadSavedTokens();
+  if (!client) {
+    return res.status(401).json({ redirect: 'https://h4i-event-management-platform-production.up.railway.app/auth' });
   }
-  client = await authenticate({
-    scopes: SCOPES,
-    keyfilePath: CREDENTIALS_PATH,
-  });
-  if (client.credentials) {
-    await saveCredentials(client);
-  }
-  return client;
+  req.authClient = client;
+  next();
 }
 
-async function sendEvent(event, auth) {
-  const calendar = google.calendar({ version: 'v3', auth });
-  calendar.events.insert({
-    auth: auth,
-    calendarId: 'primary',
-    resource: event,
-  }, function (err, event) {
-    if (err) {
-      console.log('There was an error contacting the Calendar service: ' + err);
-      return;
-    }
-    console.log('Event created: %s', event.htmlLink);
-  });
-}
-
-app.post('/sendInvite', async (req, res) => {
-  const event = req.body;
+app.post('/sendInvite', ensureAuth, async (req, res) => {
   try {
-    authorize().then(auth => sendEvent(event, auth));
-  } catch (error) {
-    console.error(error);
+    const authClient = req.authClient;
+    const created = await insertEvent(req.body, authClient);
+    res.json({ htmlLink: created.data.htmlLink });
+  } catch (err) {
+    console.error(err);
+    if (err.message.includes('visit /auth first')) {
+      console.log(err.message);
+      return res.redirect('https://h4i-event-management-platform-production.up.railway.app/auth');
+    }
+    res.status(500).json({ message: err.message });
   }
 });
 

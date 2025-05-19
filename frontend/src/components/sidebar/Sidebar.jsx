@@ -200,7 +200,6 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
 
   const sendInvite = async () => {
     try {
-      setCalendarEventAdded(true);
       const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/sendInvite", {
         method: "POST",
         headers: {
@@ -220,12 +219,16 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
           },
         })
       });
+      if (response.status === 401) {
+        window.open('https://h4i-event-management-platform-production.up.railway.app/auth', "_blank");
+        return;
+      }
       if (!response.ok) {
         throw new Error("Failed to send calendar invite");
       }
-
+      setCalendarEventAdded(true);
     } catch (error) {
-      console.log('Error sending invite:', error);
+      console.error('Error sending invite:', error);
     }
   }
 
