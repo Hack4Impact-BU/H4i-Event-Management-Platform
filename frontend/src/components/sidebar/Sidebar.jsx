@@ -200,29 +200,30 @@ const Sidebar = forwardRef(({ selectedEvent, closeSidebar, onUpdateEvent }, ref)
 
   const sendInvite = async () => {
     try {
-      // const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/sendInvite", {
-      const response = await fetch("http://localhost:3000/sendInvite", {
+      const urlParams = new URLSearchParams(window.location.search);
+      const email = urlParams.get('email');
+      const response = await fetch("https://h4i-event-management-platform-production.up.railway.app/sendInvite", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          'summary': `🌎 ${selectedEvent.title}`,
-          'location': selectedEvent.location,
-          'description': selectedEvent.description,
-          'start': {
-            'dateTime': `${selectedEvent.date}T${selectedEvent.time.start}:00-04:00`,
-            'timeZone': 'America/New_York'
+          summary: `🌎 ${selectedEvent.title}`,
+          location: selectedEvent.location,
+          description: selectedEvent.description,
+          start: {
+        dateTime: `${selectedEvent.date}T${selectedEvent.time.start}:00-04:00`,
+        timeZone: 'America/New_York'
           },
-          'end': {
-            'dateTime': `${selectedEvent.date}T${selectedEvent.time.end}:00-04:00`,
-            'timeZone': 'America/New_York'
+          end: {
+        dateTime: `${selectedEvent.date}T${selectedEvent.time.end}:00-04:00`,
+        timeZone: 'America/New_York'
           },
+          email: email
         })
       });
       if (response.status === 401) {
-        // window.open('https://h4i-event-management-platform-production.up.railway.app/auth', "_blank");
-        window.open('http://localhost:3000/auth', "_blank");
+        window.open('https://h4i-event-management-platform-production.up.railway.app/auth', "_blank");
         return;
       }
       if (!response.ok) {

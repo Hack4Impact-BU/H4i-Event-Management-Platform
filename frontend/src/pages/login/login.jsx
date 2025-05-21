@@ -31,8 +31,7 @@ const Login = ({ setIsAuthenticated, setUserEmail }) => {
                 const userInfo = await userInfoResponse.json();
 
                 // Register/update user in our backend
-                // const response = await fetch('https://h4i-event-management-platform-production.up.railway.app/users/login', {
-                const response = await fetch('http://localhost:3000/users/login', {
+                const response = await fetch('https://h4i-event-management-platform-production.up.railway.app/users/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

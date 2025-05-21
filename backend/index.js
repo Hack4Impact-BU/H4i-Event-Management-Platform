@@ -245,9 +245,9 @@ const oauth2Client = new google.auth.OAuth2(
 // Start authentication for a specific user – require an email parameter and pass it in state
 app.get('/auth', (req, res) => {
   const url = oauth2Client.generateAuthUrl({
-    access_type: 'offline',     // so you get a refresh_token
+    access_type: 'offline',
     scope: SCOPES,
-    prompt: 'consent',          // force refresh_token each time
+    prompt: 'consent',
   });
   res.redirect(url);
 });
@@ -263,17 +263,14 @@ app.get('/oauth2callback', async (req, res) => {
 
     const oauth2 = google.oauth2({ version: 'v2' });
     const { data: profile } = await oauth2.userinfo.get({ auth: oauth2Client });
-    console.log('profile', profile);
-    const email = profile.email;
-    console.log(email);
     const name = profile.name;
-    console.log(name);
 
     const updatedUser = await User.findOneAndUpdate(
       { name },
       { googleTokens: tokens },
     );
-    res.send(`Google Calendar authorized for ${email}. You can now close this window.`);
+
+    res.send(`Google Calendar authorized for ${name}. You can now close this window and retry adding event.`);
   } catch (err) {
     console.error('OAuth callback error', err);
     res.status(500).send('Authentication failed');
@@ -288,14 +285,17 @@ function setClientCredentials(tokens) {
 // Modified ensureAuth middleware – it expects the user to pass their email (in query or body)
 // and loads the corresponding googleTokens from the database.
 async function ensureAuth(req, res, next) {
-  const email = req.query.email || req.body.email;
+  const email = req.body.email;
   if (!email) {
-    return res.status(400).json({ message: "Missing email parameter" });
+    return res.status(400).json({ message: "Email is required for authentication." });
   }
-  const user = await User.findOne({ email });
-  if (!user || !user.googleTokens) {
-    return res.status(401).json({ redirect: `https://your-deployed-domain/auth?email=${encodeURIComponent(email)}` });
+
+  // Find the user by email and ensure they have googleTokens
+  const user = await User.findOne({ email, googleTokens: { $ne: null } });
+  if (!user) {
+    return res.status(401).json({ message: "User not authenticated. Please log in." });
   }
+  
   req.authClient = setClientCredentials(user.googleTokens);
   next();
 }
@@ -315,8 +315,8 @@ app.post('/sendInvite', ensureAuth, async (req, res) => {
   } catch (err) {
     console.error(err);
     // If the error indicates the user needs to re-authenticate, then redirect
-    if (err.message.includes('unauthorized')) {
-      return res.redirect(`https://your-deployed-domain/auth?email=${encodeURIComponent(req.body.email)}`);
+    if (err.message.includes('User not authenticated')) {
+      return res.redirect(`https://h4i-event-management-platform-production.up.railway.app/auth?email=${encodeURIComponent(req.body.email)}`);
     }
     res.status(500).json({ message: err.message });
   }
