@@ -233,8 +233,8 @@ app.post('/updateEvent', async (req, res) => {
   }
 });
 
-const SCOPES = ['https://www.googleapis.com/auth/calendar'];
-const TOKEN_PATH = path.join(process.cwd(), 'token.json');
+const SCOPES = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/userinfo.profile'];
+// const TOKEN_PATH = path.join(process.cwd(), 'token.json');
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_OAUTH_CLIENT_ID,
@@ -242,11 +242,12 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_OAUTH_REDIRECT_URI
 );
 
+// Start authentication for a specific user – require an email parameter and pass it in state
 app.get('/auth', (req, res) => {
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',     // so you get a refresh_token
     scope: SCOPES,
-    prompt: 'consent'           // force refresh_token each time
+    prompt: 'consent',          // force refresh_token each time
   });
   res.redirect(url);
 });
@@ -254,41 +255,58 @@ app.get('/auth', (req, res) => {
 app.get('/oauth2callback', async (req, res) => {
   try {
     const { code } = req.query;
+    if (!code) {
+      return res.status(400).send("Missing code or email");
+    }
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
-    await fs.writeFile(TOKEN_PATH, JSON.stringify(tokens));
-    res.send('Google Calendar authorized. You can now close this window.');
+
+    const oauth2 = google.oauth2({ version: 'v2' });
+    const { data: profile } = await oauth2.userinfo.get({ auth: oauth2Client });
+    console.log('profile', profile);
+    const email = profile.email;
+    console.log(email);
+    const name = profile.name;
+    console.log(name);
+
+    const updatedUser = await User.findOneAndUpdate(
+      { name },
+      { googleTokens: tokens },
+    );
+    res.send(`Google Calendar authorized for ${email}. You can now close this window.`);
   } catch (err) {
     console.error('OAuth callback error', err);
     res.status(500).send('Authentication failed');
   }
 });
 
-async function loadSavedTokens() {
-  try {
-    const content = await fs.readFile(TOKEN_PATH);
-    const tokens = JSON.parse(content);
-    oauth2Client.setCredentials(tokens);
-    return oauth2Client;
-  } catch {
-    return null;
-  }
+function setClientCredentials(tokens) {
+  oauth2Client.setCredentials(tokens);
+  return oauth2Client;
 }
 
+// Modified ensureAuth middleware – it expects the user to pass their email (in query or body)
+// and loads the corresponding googleTokens from the database.
+async function ensureAuth(req, res, next) {
+  const email = req.query.email || req.body.email;
+  if (!email) {
+    return res.status(400).json({ message: "Missing email parameter" });
+  }
+  const user = await User.findOne({ email });
+  if (!user || !user.googleTokens) {
+    return res.status(401).json({ redirect: `https://your-deployed-domain/auth?email=${encodeURIComponent(email)}` });
+  }
+  req.authClient = setClientCredentials(user.googleTokens);
+  next();
+}
+
+// Insert an event into the authenticated user's calendar
 function insertEvent(resource, auth) {
   return google.calendar({ version: 'v3', auth })
     .events.insert({ calendarId: 'primary', resource });
 }
 
-async function ensureAuth(req, res, next) {
-  const client = await loadSavedTokens();
-  if (!client) {
-    return res.status(401).json({ redirect: 'https://h4i-event-management-platform-production.up.railway.app/auth' });
-  }
-  req.authClient = client;
-  next();
-}
-
+// Endpoint to create a calendar event using the authenticated user's credentials
 app.post('/sendInvite', ensureAuth, async (req, res) => {
   try {
     const authClient = req.authClient;
@@ -296,9 +314,9 @@ app.post('/sendInvite', ensureAuth, async (req, res) => {
     res.json({ htmlLink: created.data.htmlLink });
   } catch (err) {
     console.error(err);
-    if (err.message.includes('visit /auth first')) {
-      console.log(err.message);
-      return res.redirect('https://h4i-event-management-platform-production.up.railway.app/auth');
+    // If the error indicates the user needs to re-authenticate, then redirect
+    if (err.message.includes('unauthorized')) {
+      return res.redirect(`https://your-deployed-domain/auth?email=${encodeURIComponent(req.body.email)}`);
     }
     res.status(500).json({ message: err.message });
   }
@@ -587,7 +605,8 @@ app.post('/users/login', async (req, res) => {
         email,
         name,
         color,
-        lastLoggedIn: new Date()
+        lastLoggedIn: new Date(),
+        googleTokens: null,
       });
       await user.save();
     }

@@ -17,6 +17,10 @@ const UserSchema = new mongoose.Schema({
     lastLoggedIn: {
         type: Date,
         default: Date.now
+    },
+    googleTokens: {
+        type: Object,
+        default: null,
     }
 });
 
