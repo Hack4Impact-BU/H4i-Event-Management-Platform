@@ -17,7 +17,7 @@ import FinanceTable from "../../components/financeTable/FinanceTable.jsx";
 import Piechart from "../../components/pieChart/PieChart.jsx";
 import "./finances.css";
 
-export default function Finances() {
+export default function Finances(email) {
     const [semesters, setSemesters] = useState([]);
     const [currentSemesterIndex, setCurrentSemesterIndex] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -209,7 +209,7 @@ export default function Finances() {
 
     return (
         <>
-            <NavBar />
+            <NavBar email={email}/>
             <div className="finance-budget-container">
                 <div className="semester-navigation">
                     <IconButton

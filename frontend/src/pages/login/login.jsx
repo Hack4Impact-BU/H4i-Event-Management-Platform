@@ -7,7 +7,7 @@ import H4iLogo from '../../assets/h4i_removed_bg.png';
 import GoogleLogo from '../../assets/google-logo.png';
 import "./login.css";
 
-const Login = ({ setIsAuthenticated }) => {
+const Login = ({ setIsAuthenticated, setUserEmail }) => {
     const navigate = useNavigate();
 
     const oauth = useGoogleLogin({
@@ -55,6 +55,7 @@ const Login = ({ setIsAuthenticated }) => {
 
                 // Continue with authentication flow
                 setIsAuthenticated(true);
+                setUserEmail(userInfo.email);
                 navigate('/home');
             } catch (error) {
                 console.error('Login processing error:', error);

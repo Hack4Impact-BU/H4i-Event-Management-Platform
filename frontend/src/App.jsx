@@ -15,6 +15,9 @@ function App() {
 		return !!sessionStorage.getItem("authToken");
 	});
 
+	const [userEmail, setUserEmail] = useState("");
+
+
 	function ErrorBoundary() {
 		const localLink = window.location.href.substring(
 			window.location.href.lastIndexOf("/")
@@ -38,23 +41,27 @@ function App() {
 					path="/"
 					element={
 						isAuthenticated ? (
-							<Navigate to="/home" replace />
+							<Navigate to={`/home?email=${encodeURIComponent(userEmail)}`} replace />
 						) : (
-							<Login setIsAuthenticated={setIsAuthenticated} />
+							<Login setIsAuthenticated={setIsAuthenticated} setUserEmail={setUserEmail} />
 						)
 					}
 				/>
 				<Route
 					path="/home"
 					element={
-						isAuthenticated ? <Home /> : <Navigate to="/" replace />
+						isAuthenticated ? (
+						<Home email={userEmail}/>
+						) : (
+							<Navigate to="/" replace />
+						)
 					}
 				/>
 				<Route
 					path="/finances"
 					element={
 						isAuthenticated ? (
-							<Finances />
+							<Finances email={userEmail}/>
 						) : (
 							<Navigate to="/" replace />
 						)
