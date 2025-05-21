@@ -7,14 +7,15 @@ import EventNoteOutlinedIcon from "@mui/icons-material/EventNoteOutlined";
 import H4iLogo from "../../assets/h4i_removed_bg.png";
 import "./navbar.css";
 
-const NavBar = () => {
+const NavBar = (email) => {
+	const userEmail = email.email.email
 	return (
 		<Box className="navbar">
 			<img id="h4i_logo" src={H4iLogo} alt="H4i Logo" />
 			<Box className="pages">
 				<RouterLink
 					id="events_box"
-					to="/home"
+					to={`/home?email=${encodeURIComponent(userEmail)}`}
 					style={{ textDecoration: "none" }}
 				>
 					<EventNoteOutlinedIcon id="event_icon" />
@@ -24,7 +25,7 @@ const NavBar = () => {
 				</RouterLink>
 				<RouterLink
 					id="finances_box"
-					to="/finances"
+					to={`/finances?email=${encodeURIComponent(userEmail)}`}
 					style={{ textDecoration: "none" }}
 				>
 					<AttachMoneyOutlinedIcon id="finance_icon" />

@@ -50,14 +50,18 @@ function App() {
 				<Route
 					path="/home"
 					element={
-						isAuthenticated ? <Home /> : <Navigate to="/" replace />
+						isAuthenticated ? (
+						<Home email={userEmail}/>
+						) : (
+							<Navigate to="/" replace />
+						)
 					}
 				/>
 				<Route
 					path="/finances"
 					element={
 						isAuthenticated ? (
-							<Finances />
+							<Finances email={userEmail}/>
 						) : (
 							<Navigate to="/" replace />
 						)

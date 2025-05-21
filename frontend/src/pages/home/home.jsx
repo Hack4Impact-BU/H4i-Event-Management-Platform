@@ -8,7 +8,7 @@ import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import Sidebar from "../../components/sidebar/Sidebar.jsx";
 import Filter from "../../components/filter/Filter.jsx";
 
-const Home = () => {
+const Home = (email) => {
 	const [events, setEvents] = useState([]);
 	const [upcomingEvents, setUpcomingEvents] = useState([]);
 	const [pastEvents, setPastEvents] = useState([]);
@@ -352,7 +352,7 @@ const Home = () => {
 
 	return (
 		<>
-			<NavBar />
+			<NavBar email={email}/>
 
 			<div
 				className={`home_container ${selectedEvent ? "sidebar-open" : ""
